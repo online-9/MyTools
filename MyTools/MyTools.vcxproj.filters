@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Public">
+      <UniqueIdentifier>{8206a3e4-14b5-41e9-aee8-3e3ed43376c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Algorithm">
+      <UniqueIdentifier>{daf88422-2cb3-4fac-8240-ab08c3bd3fb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemDLL">
+      <UniqueIdentifier>{3123ff0d-8e48-4c29-ab49-a3c9aa284f8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AnalysisExpression">
+      <UniqueIdentifier>{9cab2602-500d-4d5b-88ed-9053a7df78e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{907da649-50c0-4c29-8923-9c385ca94de4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Socket">
+      <UniqueIdentifier>{7909267a-f3c0-41f3-a025-32e137d9f2fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{fdf6b167-8cb8-4c9c-81c9-9ccfcafa5250}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Character">
+      <UniqueIdentifier>{770e416c-6562-46e0-8b03-aabd4712791c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{20a84b80-b6a8-4063-a340-0752977ea8b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug\Log">
+      <UniqueIdentifier>{3fe58a01-ced6-456a-9278-b941b3f815ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug\TrackStack">
+      <UniqueIdentifier>{b23c7bcf-ebaf-4981-abfa-c18df7cf6c3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{b0bb18f6-a2ea-49c4-8259-9296793b0ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread\Lock">
+      <UniqueIdentifier>{261966bc-6a7f-41bc-80a5-d940882ba99f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="s.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CLProcess.cpp">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="CLHook.cpp">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="CPublic.cpp">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="CLSearchBase.cpp">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="CLFile.cpp">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="CLInjector.cpp">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="AES.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="CLNoModuleDLL.cpp">
+      <Filter>MemDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="DES.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="CLStackTrace.cpp">
+      <Filter>Debug\TrackStack</Filter>
+    </ClCompile>
+    <ClCompile Include="CLLog.cpp">
+      <Filter>Debug\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="CLLock.cpp">
+      <Filter>Thread\Lock</Filter>
+    </ClCompile>
+    <ClCompile Include="CLMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="CLExpression.cpp">
+      <Filter>Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Character</Filter>
+    </ClCompile>
+    <ClCompile Include="CLGrammar.cpp">
+      <Filter>Character</Filter>
+    </ClCompile>
+    <ClCompile Include="CLScript.cpp">
+      <Filter>Character</Filter>
+    </ClCompile>
+    <ClCompile Include="CLExpressionCalc.cpp">
+      <Filter>Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Debug\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="CLThread.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolsPublic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CLProcess.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLHook.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLSearchBase.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLFile.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLPublic.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLInjector.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="AES.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="CLVector.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLNoModuleDLL.h">
+      <Filter>MemDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="CLNoModuleDLL_Struct.h">
+      <Filter>MemDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="DES.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="RC4.hpp">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="CLStackTrace.h">
+      <Filter>Debug\TrackStack</Filter>
+    </ClInclude>
+    <ClInclude Include="CLLog.h">
+      <Filter>Debug\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteBuffer.h">
+      <Filter>Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="CLLock.h">
+      <Filter>Thread\Lock</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassInstance.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="CLMath.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="CLExpression.h">
+      <Filter>Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Character</Filter>
+    </ClInclude>
+    <ClInclude Include="CLGrammar.h">
+      <Filter>Character</Filter>
+    </ClInclude>
+    <ClInclude Include="CLScript.h">
+      <Filter>Character</Filter>
+    </ClInclude>
+    <ClInclude Include="CLExpressionCalc.h">
+      <Filter>Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Debug\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="CLThread.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
