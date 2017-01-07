@@ -12,7 +12,7 @@
 
 #define _SELF L"Log.cpp"
 
-CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE)
+CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue")
 {
 	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hWorkExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
@@ -63,6 +63,7 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 	}
 	if (nLogOutputType & LOG_TYPE_CONSOLE)
 	{
+		//AddLogContentToQueue(LogContent_);
 		static CLLock Lock(L"Log.Print.Lock");
 		Lock.Access([LogContent_, this]{ PrintTo(LogContent_); });
 	}
@@ -216,6 +217,68 @@ BOOL CLog::SaveLog(_In_ LogContent& LogContent_)
 	return CLFile::AppendUnicodeFile(wsLogFilePath, wsContent);
 }
 
+DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
+{
+	auto pTestLog = reinterpret_cast<CLog*>(lpParm);
+	LogContent LogContent_;
+	while (pTestLog->bRun)
+	{
+		if (!pTestLog->GetLogContentForQueue(LogContent_))
+		{
+			::Sleep(50);
+			continue;
+		}
+
+		HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
+		if (hMutex == NULL)
+			return FALSE;
+
+		::CloseHandle(hMutex);
+		hMutex = NULL;
+
+		HANDLE hReadyEvent = ::OpenEvent(EVENT_ALL_ACCESS, FALSE, CL_LOG_READY_EVENT);
+		if (hReadyEvent == NULL)
+			return FALSE;
+
+		HANDLE hBufferEvent = ::OpenEventW(EVENT_ALL_ACCESS, FALSE, CL_LOG_BUFFER_EVENT);
+		if (hBufferEvent == NULL)
+		{
+			::CloseHandle(hBufferEvent);
+			return FALSE;
+		}
+
+		HANDLE hFileMap = ::OpenFileMappingW(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, CL_LOG_SHAREMEM);
+		if (hFileMap == NULL)
+		{
+			::CloseHandle(hBufferEvent);
+			::CloseHandle(hReadyEvent);
+			return FALSE;
+		}
+
+		LogContent* pLogContent = (LogContent*)MapViewOfFile(hFileMap, FILE_MAP_READ | FILE_MAP_WRITE, NULL, NULL, sizeof(LogContent));
+		if (pLogContent == nullptr)
+		{
+			::CloseHandle(hBufferEvent);
+			::CloseHandle(hReadyEvent);
+			::CloseHandle(hFileMap);
+			return FALSE;
+		}
+
+		if (::WaitForSingleObject(hReadyEvent, 1000) != WAIT_TIMEOUT)
+		{
+			*pLogContent = LogContent_;
+			::SetEvent(hBufferEvent);
+		}
+
+		::UnmapViewOfFile(pLogContent);
+		::CloseHandle(hFileMap);
+		::CloseHandle(hBufferEvent);
+		::CloseHandle(hReadyEvent);
+
+	}
+	return 0;
+}
+
 DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
 {
 	auto pTestLog = reinterpret_cast<CLog*>(lpParm);
@@ -301,4 +364,27 @@ VOID CLog::ExcuteLogServerCmd(_In_ std::shared_ptr<CmdLogContent> CmdLogContent_
 			Expr.Run(wsExpText);
 	});
 	t.detach();
+}
+
+VOID CLog::AddLogContentToQueue(_In_ CONST LogContent& LogContent_)
+{
+	Lock_LogContentQueue.Access([this, &LogContent_]
+	{
+		QueueLogContent.push(std::move(LogContent_));
+	});
+}
+
+BOOL CLog::GetLogContentForQueue(_Out_ LogContent& LogContent_)
+{
+	BOOL bExist = FALSE;
+	Lock_LogContentQueue.Access([this, &LogContent_, &bExist]
+	{
+		if (!QueueLogContent.empty())
+		{
+			LogContent_ = QueueLogContent.front();
+			QueueLogContent.pop();
+			bExist = TRUE;
+		}
+	});
+	return bExist;
 }

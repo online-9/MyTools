@@ -2,8 +2,10 @@
 #define _LOG_H__
 
 #include <memory>
+#include <queue>
 #include "ClassInstance.h"
 #include "CLExpression.h"
+#include "CLLock.h"
 
 #define LOG_TYPE_CONSOLE 0x2
 #define LOG_TYPE_FILE	 0x4
@@ -90,9 +92,15 @@ private:
 	BOOL SaveLog(_In_ LogContent& LogContent_);
 
 	static DWORD WINAPI _WorkThread(LPVOID lpParm);
+	static DWORD WINAPI _SendThread(LPVOID lpParm);
 
 	VOID ExcuteLogServerCmd(_In_ std::shared_ptr<CmdLogContent> CmdLogContent_);
+
+	VOID AddLogContentToQueue(_In_ CONST LogContent& LogContent_);
+
+	BOOL GetLogContentForQueue(_Out_ LogContent& LogContent_);
 private:
+	queue<LogContent> QueueLogContent;
 	SYSTEMTIME CurrentSysTime;
 	std::wstring wsLogFilePath;
 	std::wstring wsClientName;
@@ -100,6 +108,7 @@ private:
 	HANDLE hWorkExitEvent;
 	BOOL bRun;
 	BOOL m_bOverWrite;
+	CLLock Lock_LogContentQueue;
 private:
 	CLExpression Expr;
 };

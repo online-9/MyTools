@@ -80,6 +80,22 @@ public:
 		return itr != vlst.end();
 	}
 
+	template<class T, class Fn>
+	inline static BOOL Deque_find_if(_In_ CONST std::deque<T>& vlst, _Out_opt_ T* p, _In_ Fn _Pred)
+	{
+		auto& itr = std::find_if(vlst.begin(), vlst.end(), _Pred);
+		if (itr != vlst.end())
+			SetPtr(p, *itr);
+		return itr != vlst.end();
+	}
+
+	template<class T, class Finder>
+	static T* Deque_find_if(_In_ std::deque<T>& vlst, _In_ Finder _Pred)
+	{
+		auto& itr = std::find_if(vlst.begin(), vlst.end(), _Pred);
+		return itr == vlst.end() ? nullptr : &*itr;
+	}
+
 	// fn() = TRUE  contiune!
 	// return TRUE which TimeOut
 	static BOOL		TimeOut_By_Condition(_In_ DWORD dwMaxTimeOut, _In_ std::function<BOOL(VOID)> fn);
