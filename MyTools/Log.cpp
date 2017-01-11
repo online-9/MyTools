@@ -16,6 +16,7 @@ CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_Log
 {
 	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hWorkExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	ZeroMemory(&CurrentSysTime, sizeof(CurrentSysTime));
 }
 
@@ -290,8 +291,8 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 		::CloseHandle(hFileMap);
 		::CloseHandle(hBufferEvent);
 		::CloseHandle(hReadyEvent);
-
 	}
+	::SetEvent(pTestLog->hSendExitEvent);
 	return 0;
 }
 
