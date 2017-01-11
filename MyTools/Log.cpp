@@ -63,9 +63,9 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 	}
 	if (nLogOutputType & LOG_TYPE_CONSOLE)
 	{
-		//AddLogContentToQueue(LogContent_);
-		static CLLock Lock(L"Log.Print.Lock");
-		Lock.Access([LogContent_, this]{ PrintTo(LogContent_); });
+		AddLogContentToQueue(LogContent_);
+		//static CLLock Lock(L"Log.Print.Lock");
+		//Lock.Access([LogContent_, this]{ PrintTo(LogContent_); });
 	}
 }
 
@@ -75,6 +75,8 @@ VOID CLog::Release()
 	bRun = FALSE;
 	::WaitForSingleObject(hReleaseEvent, INFINITE);
 	::CloseHandle(hReleaseEvent);
+	::WaitForSingleObject(hSendExitEvent, INFINITE);
+	::CloseHandle(hSendExitEvent);
 }
 
 VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std::wstring wsSaveLogPath, _In_ BOOL bOverWrite, _In_ ULONG ulMaxSize)
@@ -82,6 +84,7 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	wsClientName = cwsClientName;
 	bRun = TRUE;
 	cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
+	cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
@@ -223,15 +226,12 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 	LogContent LogContent_;
 	while (pTestLog->bRun)
 	{
-		if (!pTestLog->GetLogContentForQueue(LogContent_))
-		{
-			::Sleep(50);
-			continue;
-		}
-
 		HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
 		if (hMutex == NULL)
-			return FALSE;
+		{
+			::Sleep(100);
+			continue;
+		}
 
 		::CloseHandle(hMutex);
 		hMutex = NULL;
@@ -264,10 +264,26 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 			return FALSE;
 		}
 
-		if (::WaitForSingleObject(hReadyEvent, 1000) != WAIT_TIMEOUT)
+		while (pTestLog->bRun)
 		{
-			*pLogContent = LogContent_;
-			::SetEvent(hBufferEvent);
+			if (!pTestLog->GetLogContentForQueue(LogContent_))
+			{
+				::Sleep(50);
+				continue;
+			}
+
+			hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
+			if (hMutex == NULL)
+				break;
+
+			::CloseHandle(hMutex);
+			hMutex = NULL;
+
+			if (::WaitForSingleObject(hReadyEvent, 1000) != WAIT_TIMEOUT)
+			{
+				*pLogContent = LogContent_;
+				::SetEvent(hBufferEvent);
+			}
 		}
 
 		::UnmapViewOfFile(pLogContent);
@@ -370,6 +386,9 @@ VOID CLog::AddLogContentToQueue(_In_ CONST LogContent& LogContent_)
 {
 	Lock_LogContentQueue.Access([this, &LogContent_]
 	{
+		if (QueueLogContent.size() >= 1000)
+			return;
+
 		QueueLogContent.push(std::move(LogContent_));
 	});
 }

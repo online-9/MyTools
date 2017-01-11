@@ -10,11 +10,12 @@
 #define LOG_TYPE_CONSOLE 0x2
 #define LOG_TYPE_FILE	 0x4
 
-#define LOG_C(Type,FormatText,...) CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_CONSOLE, Type, FALSE, FormatText, __VA_ARGS__)
-#define LOG_F(Type,FormatText,...) CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_FILE, Type, FALSE, FormatText, __VA_ARGS__)
+#define LOG_C(Type,FormatText,...)	CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_CONSOLE, Type, FALSE, FormatText, __VA_ARGS__)
+#define LOG_F(Type,FormatText,...)	CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_FILE, Type, FALSE, FormatText, __VA_ARGS__)
 #define LOG_CF(Type,FormatText,...) CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_CONSOLE | LOG_TYPE_FILE, Type, FALSE, FormatText, __VA_ARGS__)
 #define LOG_FC(Type,FormatText,...) LOG_CF(Type, FormatText, __VA_ARGS__)
 #define LOG_MSG_CF(Type,FormatText,...) CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_CONSOLE, Type, TRUE, FormatText, __VA_ARGS__)
+#define LOG_CF_D(FormatText,...)	LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug,FormatText, __VA_ARGS__)
 
 class CLog : public virtual CClassInstance<CLog>
 {
@@ -106,6 +107,7 @@ private:
 	std::wstring wsClientName;
 	HANDLE hReleaseEvent;
 	HANDLE hWorkExitEvent;
+	HANDLE hSendExitEvent;
 	BOOL bRun;
 	BOOL m_bOverWrite;
 	CLLock Lock_LogContentQueue;
