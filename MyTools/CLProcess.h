@@ -53,6 +53,8 @@ public:
 	static BOOL		LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath);
 	static BOOL		CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWSTR pwszDLLPath, __out PROCESS_INFORMATION* pPROCESS_INFORMATION = nullptr);
 	static BOOL		CreateProcess_InjectorRemoteDLL(__in LPCWSTR pwszProcPath, __in LPCWSTR pwszDLLPath, __out PROCESS_INFORMATION* pPROCESS_INFORMATION = nullptr);
+	static BOOL		TerminateProc_By_DupHandle(_In_ DWORD dwPid);
+	static BOOL		TerminateProc_By_UnLoad_NtDLL(_In_ DWORD dwPid);
 private:
 
 };

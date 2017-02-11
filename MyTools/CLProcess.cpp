@@ -39,7 +39,7 @@ DWORD CLProcess::GetPid_For_ProcName(__in LPCWSTR pszText)
 	do
 	{
 		//比对进程名
-		if (CCharacter::wstrstr_my(pe32.szExeFile, pszText))
+		if (CCharacter::wstrstr_my(CCharacter::MakeTextToLower(pe32.szExeFile).c_str(), CCharacter::MakeTextToLower(pszText).c_str()))
 		{
 			DWORD dwPid = pe32.th32ProcessID;
 			::CloseHandle(hThSnap32);
@@ -531,4 +531,31 @@ BOOL CLProcess::GetProcName_By_Pid(_In_ DWORD dwPid, _Out_opt_ std::wstring& wsP
 		}
 		return FALSE;
 	}) != vlst.end();
+}
+
+BOOL CLProcess::TerminateProc_By_DupHandle(_In_ DWORD dwPid)
+{
+	HANDLE hProcess = ::OpenProcess(PROCESS_DUP_HANDLE, FALSE, dwPid);
+	if (hProcess == NULL)
+		return FALSE;
+
+	DuplicateHandle(hProcess, INVALID_HANDLE_VALUE, GetCurrentProcess(), &hProcess, PROCESS_ALL_ACCESS, FALSE, DUPLICATE_SAME_ACCESS);
+	::TerminateProcess(hProcess, 0);
+	::CloseHandle(hProcess);
+	return TRUE;
+}
+
+BOOL CLProcess::TerminateProc_By_UnLoad_NtDLL(_In_ DWORD dwPid)
+{
+	HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPid);
+	if (hProcess == NULL)
+		return FALSE;
+
+	typedef ULONG(WINAPI *PFNNtUnmapViewOfSection)(IN HANDLE ProcessHandle, IN PVOID BaseAddress);
+	PFNNtUnmapViewOfSection pNtUnmapViewOfSection = (PFNNtUnmapViewOfSection)::GetProcAddress(::GetModuleHandleW(L"ntdll.dll"), "NtUnmapViewOfSection");
+	if (pNtUnmapViewOfSection == NULL)
+		return FALSE;
+
+	pNtUnmapViewOfSection(hProcess, ::GetModuleHandleW(L"ntdll.dll"));
+	return TRUE;
 }

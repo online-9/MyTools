@@ -8,7 +8,7 @@
 
 CLLock::CLLock(_In_ std::wstring wsLockName_) : wsLockName(wsLockName_)
 {
-	hMutex = ::CreateMutexW(NULL, FALSE, NULL);
+	hMutex = ::CreateMutexW(NULL, FALSE, wsLockName_.c_str());
 	//InitializeCriticalSection(&cs);
 }
 

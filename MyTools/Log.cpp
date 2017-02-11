@@ -230,7 +230,8 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 		HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
 		if (hMutex == NULL)
 		{
-			::Sleep(100);
+			pTestLog->GetLogContentForQueue(LogContent_);
+			::Sleep(50);
 			continue;
 		}
 
@@ -360,6 +361,13 @@ DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
 		auto pCmdLogContent = std::make_shared<CmdLogContent>(*pLogContent);
 		pTestLog->ExcuteLogServerCmd(pCmdLogContent);
 	}
+
+	::UnmapViewOfFile(pLogContent);
+	::CloseHandle(hReadyEvent);
+	::CloseHandle(hBufferEvent);
+	::CloseHandle(hMutex);
+	::CloseHandle(hMapFile);
+
 	::SetEvent(pTestLog->hReleaseEvent);
 	return 0;
 }

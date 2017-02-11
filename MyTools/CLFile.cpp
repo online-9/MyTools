@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CLFile.h"
+#include <mutex>
 #include "CLLog.h"
 #include "Character.h"
 #include "CLPublic.h"
@@ -63,9 +64,8 @@ BOOL CLFile::ReadUnicodeFile(__in CONST std::wstring& wsPath, __out std::wstring
 BOOL CLFile::WriteUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::wstring& wsContent)
 {
 	// Exist Write File Mutex
-	HANDLE hMutex = ::CreateMutexW(NULL, FALSE, L"WriteUnicodeFile_Mutex");
-	WaitForSingleObject(hMutex, 5 * 1000);
-
+	static std::mutex MutexWriteUnicodeFile;
+	std::lock_guard<std::mutex> lck(MutexWriteUnicodeFile);
 	if (!CLPublic::FileExit(wsPath.c_str()))
 		CreateUnicodeTextFile(wsPath);
 
@@ -74,7 +74,6 @@ BOOL CLFile::WriteUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::w
 	if (pFile == nullptr)
 	{
 		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
-		::ReleaseMutex(hMutex);
 		return FALSE;
 	}
 
@@ -86,15 +85,14 @@ BOOL CLFile::WriteUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::w
 
 	fwrite(pwstrBuffer.get(), sizeof(WCHAR), wsContent.length() + 1, pFile);
 	fclose(pFile);
-	::ReleaseMutex(hMutex);
 	return TRUE;
 }
 
 BOOL WINAPI CLFile::WriteASCIIFile(_In_ CONST std::wstring& wsPath, _In_ CONST std::wstring& wsContent)
 {
 	// Exist Write File Mutex
-	HANDLE hMutex = ::CreateMutexW(NULL, FALSE, L"WriteASCIIFile_Mutex");
-	WaitForSingleObject(hMutex, 5 * 1000);
+	static std::mutex MutexWriteASCIIFile;
+	std::lock_guard<std::mutex> lck(MutexWriteASCIIFile);
 
 	if (!CLPublic::FileExit(wsPath.c_str()))
 		CreateASCIITextFile(wsPath);
@@ -104,7 +102,6 @@ BOOL WINAPI CLFile::WriteASCIIFile(_In_ CONST std::wstring& wsPath, _In_ CONST s
 	if (pFile == nullptr)
 	{
 		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
-		::ReleaseMutex(hMutex);
 		return FALSE;
 	}
 
@@ -114,7 +111,6 @@ BOOL WINAPI CLFile::WriteASCIIFile(_In_ CONST std::wstring& wsPath, _In_ CONST s
 
 	fwrite(str.c_str(), sizeof(CHAR), str.length(), pFile);
 	fclose(pFile);
-	::ReleaseMutex(hMutex);
 	return TRUE;
 }
 
@@ -194,9 +190,8 @@ BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ cwstring& cwsPath, _In_ LONG ulFil
 BOOL WINAPI CLFile::AppendUnicodeFile(__in cwstring& wsPath, __in cwstring& cwsContent)
 {
 	// Exist Write File Mutex
-	HANDLE hMutex = ::CreateMutexW(NULL, FALSE, L"WriteUnicodeFile_Mutex");
-	if (hMutex != NULL)
-		WaitForSingleObject(hMutex, 5 * 1000);
+	static std::mutex MutexAppendUnicodeFile;
+	std::lock_guard<std::mutex> lck(MutexAppendUnicodeFile);
 
 	if (!CLPublic::FileExit(wsPath.c_str()))
 		CreateUnicodeTextFile(wsPath);
@@ -206,7 +201,6 @@ BOOL WINAPI CLFile::AppendUnicodeFile(__in cwstring& wsPath, __in cwstring& cwsC
 	if (pFile == nullptr)
 	{
 		Log(LOG_LEVEL_EXCEPTION, L"AppendUnicodeFile Fiald! Path:%s", wsPath.c_str());
-		::ReleaseMutex(hMutex);
 		return FALSE;
 	}
 
@@ -218,13 +212,6 @@ BOOL WINAPI CLFile::AppendUnicodeFile(__in cwstring& wsPath, __in cwstring& cwsC
 
 	fwrite(wsContent.c_str(), sizeof(WCHAR), wsContent.length(), pFile);
 	fclose(pFile);
-
-	if (hMutex != NULL)
-	{
-		::ReleaseMutex(hMutex);
-		::CloseHandle(hMutex);
-	}
-
 	return TRUE;
 }
 

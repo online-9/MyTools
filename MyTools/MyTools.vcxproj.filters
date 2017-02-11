@@ -52,6 +52,9 @@
     <Filter Include="Thread\Lock">
       <UniqueIdentifier>{261966bc-6a7f-41bc-80a5-d940882ba99f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Time">
+      <UniqueIdentifier>{a51502e8-514d-416f-9ad2-cabc09df67e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s.cpp">
@@ -116,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="CLThread.cpp">
       <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeTick.cpp">
+      <Filter>Time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -199,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="CLThread.h">
       <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeTick.h">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

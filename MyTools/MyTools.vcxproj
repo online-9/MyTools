@@ -83,6 +83,7 @@
     <ClCompile Include="DES.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="s.cpp" />
+    <ClCompile Include="TimeTick.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AES.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="RC4.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TimeTick.h" />
     <ClInclude Include="ToolsPublic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

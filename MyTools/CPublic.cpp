@@ -501,7 +501,7 @@ BOOL CLPublic::TimeOut_By_Condition(_In_ DWORD dwMaxTimeOut, _In_ std::function<
 {
 	BOOL bRetCode = TRUE;
 	auto ulTick = ::GetTickCount64();
-	while (::GetTickCount64() - ulTick <= dwMaxTimeOut)
+	while (static_cast<DWORD>(::GetTickCount64() - ulTick) <= dwMaxTimeOut)
 	{
 		if (fn())
 		{
