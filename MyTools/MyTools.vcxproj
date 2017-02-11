@@ -43,6 +43,8 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -73,6 +75,7 @@
     <ClCompile Include="CLLock.cpp" />
     <ClCompile Include="CLLog.cpp" />
     <ClCompile Include="CLMath.cpp" />
+    <ClCompile Include="CLPic.cpp" />
     <ClCompile Include="CLProcess.cpp" />
     <ClCompile Include="CLScript.cpp" />
     <ClCompile Include="CLSearchBase.cpp" />
@@ -100,8 +103,10 @@
     <ClInclude Include="CLLog.h" />
     <ClInclude Include="CLMath.h" />
     <ClInclude Include="CLNoModuleDLL_Struct.h" />
+    <ClInclude Include="CLPic.h" />
     <ClInclude Include="CLProcess.h" />
     <ClInclude Include="CLPublic.h" />
+    <ClInclude Include="CLResManager.h" />
     <ClInclude Include="CLScript.h" />
     <ClInclude Include="CLSearchBase.h" />
     <ClInclude Include="CLStackTrace.h" />

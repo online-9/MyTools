@@ -55,6 +55,15 @@
     <Filter Include="Time">
       <UniqueIdentifier>{a51502e8-514d-416f-9ad2-cabc09df67e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pic">
+      <UniqueIdentifier>{880ea252-50c7-4eca-9015-ebf2d7efb0c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Res">
+      <UniqueIdentifier>{b30b915d-ebc2-4a6f-8a9f-da3c0d46c45f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File">
+      <UniqueIdentifier>{8aaa1ea9-d051-42cb-a21c-3dfb19ffad14}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s.cpp">
@@ -70,9 +79,6 @@
       <Filter>Public</Filter>
     </ClCompile>
     <ClCompile Include="CLSearchBase.cpp">
-      <Filter>Public</Filter>
-    </ClCompile>
-    <ClCompile Include="CLFile.cpp">
       <Filter>Public</Filter>
     </ClCompile>
     <ClCompile Include="CLInjector.cpp">
@@ -108,9 +114,6 @@
     <ClCompile Include="CLGrammar.cpp">
       <Filter>Character</Filter>
     </ClCompile>
-    <ClCompile Include="CLScript.cpp">
-      <Filter>Character</Filter>
-    </ClCompile>
     <ClCompile Include="CLExpressionCalc.cpp">
       <Filter>Character</Filter>
     </ClCompile>
@@ -122,6 +125,15 @@
     </ClCompile>
     <ClCompile Include="TimeTick.cpp">
       <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="CLPic.cpp">
+      <Filter>Pic</Filter>
+    </ClCompile>
+    <ClCompile Include="CLScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="CLFile.cpp">
+      <Filter>File</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,9 +150,6 @@
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="CLSearchBase.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="CLFile.h">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="CLPublic.h">
@@ -194,9 +203,6 @@
     <ClInclude Include="CLGrammar.h">
       <Filter>Character</Filter>
     </ClInclude>
-    <ClInclude Include="CLScript.h">
-      <Filter>Character</Filter>
-    </ClInclude>
     <ClInclude Include="CLExpressionCalc.h">
       <Filter>Character</Filter>
     </ClInclude>
@@ -208,6 +214,18 @@
     </ClInclude>
     <ClInclude Include="TimeTick.h">
       <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="CLPic.h">
+      <Filter>Pic</Filter>
+    </ClInclude>
+    <ClInclude Include="CLResManager.h">
+      <Filter>Res</Filter>
+    </ClInclude>
+    <ClInclude Include="CLScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="CLFile.h">
+      <Filter>File</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
