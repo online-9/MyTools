@@ -94,23 +94,32 @@ private:
 
 	static DWORD WINAPI _WorkThread(LPVOID lpParm);
 	static DWORD WINAPI _SendThread(LPVOID lpParm);
+	static DWORD WINAPI _SaveThread(LPVOID lpParm);
 
 	VOID ExcuteLogServerCmd(_In_ std::shared_ptr<CmdLogContent> CmdLogContent_);
 
 	VOID AddLogContentToQueue(_In_ CONST LogContent& LogContent_);
 
 	BOOL GetLogContentForQueue(_Out_ LogContent& LogContent_);
+
+	VOID AddSaveLogToQueue(_In_ CONST LogContent& LogContent_);
+
+	BOOL GetSaveLogContentForQueue(_Out_ LogContent& LogContent_);
 private:
 	queue<LogContent> QueueLogContent;
+	queue<LogContent> QueueSaveLogContent;
+
 	SYSTEMTIME CurrentSysTime;
 	std::wstring wsLogFilePath;
 	std::wstring wsClientName;
+	HANDLE hSaveLogEvent;
 	HANDLE hReleaseEvent;
 	HANDLE hWorkExitEvent;
 	HANDLE hSendExitEvent;
 	BOOL bRun;
 	BOOL m_bOverWrite;
 	CLLock Lock_LogContentQueue;
+	CLLock Lock_SaveLogContentQueue;
 private:
 	CLExpression Expr;
 };

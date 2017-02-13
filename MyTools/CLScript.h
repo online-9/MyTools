@@ -100,8 +100,6 @@ typedef struct _CL_Script_CustomeFunction
 	}
 }CL_Script_CustomeFunction;
 
-
-
 class CLScript
 {
 public:
@@ -109,14 +107,14 @@ public:
 	~CLScript();
 
 	// 
-	BOOL Read(__in LPCWSTR pwszScriptPath);
-	BOOL Read(__in std::shared_ptr<WCHAR>& pScriptStr);
+	BOOL Read(_In_ LPCWSTR pwszScriptPath);
+	BOOL Read(_In_ CONST std::wstring& wsScriptContent);
 	
 	// Add FunAddr to List
-	BOOL AddCustomeFunAddr(_In_ CONST std::wstring& wsFunName, __in CLScriptFun pScriptFunAddr);
+	BOOL AddCustomeFunAddr(_In_ CONST std::wstring& wsFunName, _In_ CLScriptFun pScriptFunAddr);
 
 	// 
-	BOOL Excute(_In_ CONST std::wstring& wsName);
+	BOOL Excute(_In_ CONST std::wstring& wsName, _In_ std::function<BOOL(VOID)> fnExceptionPtr);
 
 	CONST std::vector<CL_Script_CustomeFunction>& GetCustomeFunList() CONST;
 	CONST std::vector<CL_Script_TranCode>&	GetSourceList() CONST;
@@ -128,6 +126,7 @@ public:
 	BOOL Check(_Out_opt_ std::wstring& wsErrText);
 protected:
 	virtual BOOL IsExcuteNext();
+	std::function<BOOL(VOID)> m_fnExceptionPtr;
 protected:
 	virtual VOID SetSciptPtr();
 
@@ -135,14 +134,14 @@ protected:
 	BOOL ReadScriptFile(_In_ CONST std::wstring& wsPath);
 
 	// Read Content to list
-	BOOL ReadScriptContent(__in LPCSTR pszScriptContent);
+	BOOL ReadScriptContent(_In_ LPCSTR pszScriptContent);
 	BOOL ReadScriptContent(_In_ CONST std::wstring& wsContent);
 
 	// Analysis Code
 	BOOL AnalysisSourceCode();
 
 	// Excute Content
-	BOOL ExcuteContent(__in std::vector<CL_Script_TranCode>::iterator itr, __in const std::vector<CL_Script_TranCode>::iterator EndItr);
+	BOOL ExcuteContent(_In_ std::vector<CL_Script_TranCode>::iterator itr, _In_ const std::vector<CL_Script_TranCode>::iterator EndItr);
 
 	em_CL_Script_Code_Type GetSourceType(_In_ CONST std::wstring wsText);
 
@@ -156,15 +155,16 @@ protected:
 	//BOOL AnalsisCode_If(_In_ cwstring& wsText, __out LPVOID& pAddr);
 
 	// 
-	BOOL ExcuteCode_If(__in std::vector<CL_Script_TranCode>::iterator CodeItr, __in BOOL bResult);
+	BOOL ExcuteCode_If(_In_ std::vector<CL_Script_TranCode>::iterator CodeItr, _In_ BOOL bResult);
 
 	// 
-	std::vector<CL_Script_TranCode>::iterator GetItr_By_CodeType(__in const std::vector<CL_Script_TranCode>::iterator Startitr, em_CL_Script_Code_Type emCodeType);
+	std::vector<CL_Script_TranCode>::iterator GetItr_By_CodeType(_In_ const std::vector<CL_Script_TranCode>::iterator Startitr, em_CL_Script_Code_Type emCodeType);
 
 	// Release Res
 	BOOL Release();
 
 	// Excute Function( Script Function && Cusome Function)
+	
 	BOOL ExcuteFunction(_In_ CONST std::wstring& wsName, _In_ std::vector<CL_Script_TranCode_FunParm>& vlst);
 
 public:

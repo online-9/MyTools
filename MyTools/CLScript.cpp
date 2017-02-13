@@ -15,6 +15,7 @@ CLScript::CLScript()
 	bExit = FALSE;
 	lpCustomeFunParm = this;
 	bShowDebugMsg = FALSE;
+	m_fnExceptionPtr = nullptr;
 }
 
 CLScript::~CLScript()
@@ -232,18 +233,19 @@ BOOL CLScript::ExcuteFunction(_In_ cwstring& wsName, _In_ std::vector<CL_Script_
 		}
 		__except (CLLog::PrintExceptionCode(GetExceptionInformation()))
 		{
-			LogMsgBox(LOG_LEVEL_EXCEPTION, L"fnExcuteCustomeFun发生了异常");
+			Log(LOG_LEVEL_EXCEPTION, L"fnExcuteCustomeFun发生了异常");
 		}
-		return FALSE;
+		
+		return m_fnExceptionPtr != nullptr ? m_fnExceptionPtr() : FALSE;
 	};
 
 	Log(LOG_LEVEL_NORMAL, L"执行自定义函数:%s", wsName.c_str());
 	return fnExcuteCustomeFun();
 }
 
-BOOL CLScript::ExcuteContent(__in std::vector<CL_Script_TranCode>::iterator itr, __in const std::vector<CL_Script_TranCode>::iterator EndItr)
+BOOL CLScript::ExcuteContent(_In_ std::vector<CL_Script_TranCode>::iterator itr, _In_ const std::vector<CL_Script_TranCode>::iterator EndItr)
 {
-	auto FindCodeType = [this](__in em_CL_Script_Code_Type emType)
+	auto FindCodeType = [this](_In_ em_CL_Script_Code_Type emType)
 	{
 		return std::find_if(ScriptCodeList.begin(), ScriptCodeList.end(), [&emType](CL_Script_TranCode& Cf){ return Cf.emCodeType == emType; });
 	};
@@ -290,7 +292,7 @@ BOOL CLScript::ExcuteContent(__in std::vector<CL_Script_TranCode>::iterator itr,
 	return TRUE;
 }
 
-BOOL CLScript::AddCustomeFunAddr(_In_ cwstring& wsFunName, __in CLScriptFun pScriptFunAddr)
+BOOL CLScript::AddCustomeFunAddr(_In_ cwstring& wsFunName, _In_ CLScriptFun pScriptFunAddr)
 {
 	CL_Script_CustomeFunction CL_Script_CustomeFunction_;
 	if (IsExistCustomeFunAddrList(wsFunName, CL_Script_CustomeFunction_))
@@ -334,7 +336,7 @@ BOOL CLScript::IsExistCustomeFunAddrList(_In_ cwstring& wsFunname, _Out_opt_ CL_
 	return bRetCode;
 }
 
-BOOL CLScript::ExcuteCode_If(__in std::vector<CL_Script_TranCode>::iterator CodeItr, __in BOOL bResult)
+BOOL CLScript::ExcuteCode_If(_In_ std::vector<CL_Script_TranCode>::iterator CodeItr, _In_ BOOL bResult)
 {
 	/*for (auto itr = CodeItr + 1; itr != ScriptCodeList.end(); ++itr)
 	{
@@ -343,12 +345,12 @@ BOOL CLScript::ExcuteCode_If(__in std::vector<CL_Script_TranCode>::iterator Code
 	return TRUE;
 }
 
-std::vector<CL_Script_TranCode>::iterator CLScript::GetItr_By_CodeType(__in const std::vector<CL_Script_TranCode>::iterator Startitr, em_CL_Script_Code_Type emCodeType)
+std::vector<CL_Script_TranCode>::iterator CLScript::GetItr_By_CodeType(_In_ const std::vector<CL_Script_TranCode>::iterator Startitr, em_CL_Script_Code_Type emCodeType)
 {
 	return std::find_if(Startitr, ScriptCodeList.end(), [&emCodeType](CL_Script_TranCode& TranCode){ return TranCode.emCodeType == emCodeType; });
 }
 
-BOOL CLScript::Read(__in LPCWSTR pwszScriptPath)
+BOOL CLScript::Read(_In_ LPCWSTR pwszScriptPath)
 {
 	_CLStackTrace(L"CLScript::Read");
 	if (!ReadScriptFile(pwszScriptPath))
@@ -363,11 +365,11 @@ BOOL CLScript::Read(__in LPCWSTR pwszScriptPath)
 	return TRUE;
 }
 
-BOOL CLScript::Read(__in std::shared_ptr<WCHAR>& pScriptStr)
+BOOL CLScript::Read(_In_ CONST std::wstring& wsScriptContent)
 {
 	try
 	{
-		if (!ReadScriptContent(pScriptStr.get()))
+		if (!ReadScriptContent(wsScriptContent))
 			return FALSE;
 
 		if (!AnalysisSourceCode())
@@ -411,15 +413,15 @@ BOOL CLScript::Release()
 	return TRUE;
 }
 
-BOOL CLScript::Excute(_In_ cwstring& wsName)
+BOOL CLScript::Excute(_In_ CONST std::wstring& wsName, _In_ std::function<BOOL(VOID)> fnExceptionPtr)
 {
 	std::vector<CL_Script_TranCode_FunParm> EmptyParmList;
-
-	//bExit = FALSE;
+	
+	m_fnExceptionPtr = fnExceptionPtr;
 	return ExcuteFunction(wsName, EmptyParmList);
 }
 
-BOOL CLScript::ReadScriptContent(__in LPCSTR pszScriptContent)
+BOOL CLScript::ReadScriptContent(_In_ LPCSTR pszScriptContent)
 {
 	try
 	{

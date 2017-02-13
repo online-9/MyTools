@@ -12,11 +12,12 @@
 
 #define _SELF L"Log.cpp"
 
-CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue")
+CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue"), Lock_SaveLogContentQueue(L"Lock_SaveLogContentQueue")
 {
 	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hWorkExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	ZeroMemory(&CurrentSysTime, sizeof(CurrentSysTime));
 }
 
@@ -60,7 +61,8 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 
 	if (nLogOutputType & LOG_TYPE_FILE)
 	{
-		SaveLog(LogContent_);
+		AddSaveLogToQueue(LogContent_);
+		//SaveLog(LogContent_);
 	}
 	if (nLogOutputType & LOG_TYPE_CONSOLE)
 	{
@@ -76,8 +78,15 @@ VOID CLog::Release()
 	bRun = FALSE;
 	::WaitForSingleObject(hReleaseEvent, INFINITE);
 	::CloseHandle(hReleaseEvent);
+	hReleaseEvent = NULL;
+
 	::WaitForSingleObject(hSendExitEvent, INFINITE);
 	::CloseHandle(hSendExitEvent);
+	hSendExitEvent = NULL;
+
+	::WaitForSingleObject(hSaveLogEvent, INFINITE);
+	::CloseHandle(hSaveLogEvent);
+	hSaveLogEvent = NULL;
 }
 
 VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std::wstring wsSaveLogPath, _In_ BOOL bOverWrite, _In_ ULONG ulMaxSize)
@@ -86,6 +95,7 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	bRun = TRUE;
 	cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
 	cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
+	cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
@@ -178,7 +188,7 @@ BOOL CLog::SaveLog(_In_ LogContent& LogContent_)
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
 
-	if (!m_bOverWrite && SysTime.wDay != CurrentSysTime.wDay)
+	if ((!m_bOverWrite && SysTime.wDay != CurrentSysTime.wDay) || !CLPublic::FileExit(wsLogFilePath.c_str()))
 	{
 		// have to create new log!
 		WCHAR wszFileName[64];
@@ -191,9 +201,6 @@ BOOL CLog::SaveLog(_In_ LogContent& LogContent_)
 		wsLogFilePath = wszText;
 		CLFile::WriteUnicodeFile(wsLogFilePath, L"");;
 	}
-
-	if (!CLPublic::FileExit(wsLogFilePath.c_str()))
-		return FALSE;
 
 	wsContent += L"#Stack:\r\n";
 	swprintf_s(wszText, _countof(wszText) - 1, L" #Time:%02d:%02d:%02d ", SysTime.wHour, SysTime.wMinute, SysTime.wSecond);
@@ -415,4 +422,46 @@ BOOL CLog::GetLogContentForQueue(_Out_ LogContent& LogContent_)
 		}
 	});
 	return bExist;
+}
+
+VOID CLog::AddSaveLogToQueue(_In_ CONST LogContent& LogContent_)
+{
+	Lock_SaveLogContentQueue.Access([this, &LogContent_]
+	{
+		if (QueueSaveLogContent.size() >= 1000)
+			return;
+
+		QueueSaveLogContent.push(std::move(LogContent_));
+	});
+}
+
+BOOL CLog::GetSaveLogContentForQueue(_Out_ LogContent& LogContent_)
+{
+	BOOL bExist = FALSE;
+	Lock_SaveLogContentQueue.Access([this, &LogContent_, &bExist]
+	{
+		if (!QueueSaveLogContent.empty())
+		{
+			LogContent_ = QueueSaveLogContent.front();
+			QueueSaveLogContent.pop();
+			bExist = TRUE;
+		}
+	});
+	return bExist;
+}
+
+DWORD WINAPI CLog::_SaveThread(LPVOID lpParm)
+{
+	auto pTestLog = reinterpret_cast<CLog*>(lpParm);
+	LogContent LogContent_;
+	while (pTestLog->bRun)
+	{
+		if (!pTestLog->GetSaveLogContentForQueue(LogContent_))
+		{
+			::Sleep(100);
+			continue;
+		}
+		pTestLog->SaveLog(LogContent_);
+	}
+	return 0;
 }
