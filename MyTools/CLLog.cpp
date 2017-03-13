@@ -145,9 +145,14 @@ BOOL CLLog::PrintLogTo(_In_ _LogContent& LogContent)
 BOOL CLLog::SaveLog(_In_ _LogContent& LogContent)
 {
 	if (!CLPublic::FileExit(wsLocalLogPath.c_str()))
-	{
 		return FALSE;
-	}
+
+	ULONG ulFileLen = 0;
+	if (!CLFile::ReadAsciiFileLen(wsLocalLogPath, ulFileLen))
+		return FALSE;
+
+	if (ulFileLen >= 20 * 1024 * 1024)
+		CLFile::WriteUnicodeFile(wsLocalLogPath, L"");
 
 	static WCHAR wszText[1024];
 	std::wstring wsContent;

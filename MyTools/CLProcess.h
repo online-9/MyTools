@@ -55,6 +55,9 @@ public:
 	static BOOL		CreateProcess_InjectorRemoteDLL(__in LPCWSTR pwszProcPath, __in LPCWSTR pwszDLLPath, __out PROCESS_INFORMATION* pPROCESS_INFORMATION = nullptr);
 	static BOOL		TerminateProc_By_DupHandle(_In_ DWORD dwPid);
 	static BOOL		TerminateProc_By_UnLoad_NtDLL(_In_ DWORD dwPid);
+	
+	// Process CPU usage
+	static int		GetCpuUsageByPid(_In_ DWORD dwPid, _In_ _Out_ LONGLONG& llLastTime, _In_ _Out_ LONGLONG& llLastSysTime);
 private:
 
 };

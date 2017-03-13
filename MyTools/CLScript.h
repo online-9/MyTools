@@ -107,8 +107,8 @@ public:
 	~CLScript();
 
 	// 
-	BOOL Read(_In_ LPCWSTR pwszScriptPath);
-	BOOL Read(_In_ CONST std::wstring& wsScriptContent);
+	enum em_Read_Type{ em_Read_Type_Path, em_Read_Type_Content };
+	BOOL Read(_In_ em_Read_Type emReadType, _In_ CONST std::wstring& wsText);
 	
 	// Add FunAddr to List
 	BOOL AddCustomeFunAddr(_In_ CONST std::wstring& wsFunName, _In_ CLScriptFun pScriptFunAddr);

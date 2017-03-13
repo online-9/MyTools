@@ -153,7 +153,7 @@ BOOL WINAPI CLFile::AppendFile(_In_ CONST std::wstring& cwsPath, _In_ CONST BYTE
 BOOL WINAPI CLFile::ReadAsciiFileLen(_In_ CONST std::wstring& cwsPath, _Out_ ULONG& ulFileLen)
 {
 	FILE* pFile = nullptr;
-	fopen_s(&pFile, CCharacter::UnicodeToASCII(cwsPath).c_str(), "rb");
+	_wfopen_s(&pFile, cwsPath.c_str(), L"rb");
 	if (pFile == nullptr)
 	{
 		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", cwsPath.c_str());
@@ -171,7 +171,7 @@ BOOL WINAPI CLFile::ReadAsciiFileLen(_In_ CONST std::wstring& cwsPath, _Out_ ULO
 BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ cwstring& cwsPath, _In_ LONG ulFileLen, _Out_ std::shared_ptr<CHAR>& psContent)
 {
 	FILE* pFile = nullptr;
-	fopen_s(&pFile, CCharacter::UnicodeToASCII(cwsPath).c_str(), "rb");
+	_wfopen_s(&pFile, cwsPath.c_str(), L"rb");
 	if (pFile == nullptr)
 	{
 		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", cwsPath.c_str());

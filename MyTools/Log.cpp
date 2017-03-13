@@ -8,16 +8,13 @@
 #include "CLPublic.h"
 #include "CLFile.h"
 #include "CLExpressionCalc.h"
+#include "CLResManager.h"
 #include <Shlwapi.h>
 
 #define _SELF L"Log.cpp"
 
 CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue"), Lock_SaveLogContentQueue(L"Lock_SaveLogContentQueue")
 {
-	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
-	hWorkExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
-	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
-	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	ZeroMemory(&CurrentSysTime, sizeof(CurrentSysTime));
 }
 
@@ -76,26 +73,43 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 VOID CLog::Release()
 {
 	bRun = FALSE;
-	::WaitForSingleObject(hReleaseEvent, INFINITE);
-	::CloseHandle(hReleaseEvent);
-	hReleaseEvent = NULL;
-
-	::WaitForSingleObject(hSendExitEvent, INFINITE);
-	::CloseHandle(hSendExitEvent);
-	hSendExitEvent = NULL;
-
-	::WaitForSingleObject(hSaveLogEvent, INFINITE);
-	::CloseHandle(hSaveLogEvent);
-	hSaveLogEvent = NULL;
+	if (hReleaseEvent != NULL)
+	{
+		::WaitForSingleObject(hReleaseEvent, INFINITE);
+		::CloseHandle(hReleaseEvent);
+		hReleaseEvent = NULL;
+	}
+	if (hSendExitEvent != NULL)
+	{
+		::WaitForSingleObject(hSendExitEvent, INFINITE);
+		::CloseHandle(hSendExitEvent);
+		hSendExitEvent = NULL;
+	}
+	if (hSaveLogEvent != NULL)
+	{
+		::WaitForSingleObject(hSaveLogEvent, INFINITE);
+		::CloseHandle(hSaveLogEvent);
+		hSaveLogEvent = NULL;
+	}
 }
 
 VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std::wstring wsSaveLogPath, _In_ BOOL bOverWrite, _In_ ULONG ulMaxSize)
 {
+	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+	hWorkExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+
 	wsClientName = cwsClientName;
 	bRun = TRUE;
-	cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
-	cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
-	cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
+	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
+	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
+
+	auto hSendThread = cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
+	SetResDeleter(hSendThread, [](HANDLE& hThread) { ::CloseHandle(hThread); });
+
+	auto hSaveThread = cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
+	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
@@ -358,7 +372,7 @@ DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
 		return 0;
 	}
 
-	
+
 	while (pTestLog->bRun)
 	{
 		::SetEvent(hReadyEvent);
@@ -463,5 +477,6 @@ DWORD WINAPI CLog::_SaveThread(LPVOID lpParm)
 		}
 		pTestLog->SaveLog(LogContent_);
 	}
+	::SetEvent(pTestLog->hSaveLogEvent);
 	return 0;
 }

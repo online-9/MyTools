@@ -559,3 +559,63 @@ BOOL CLProcess::TerminateProc_By_UnLoad_NtDLL(_In_ DWORD dwPid)
 	pNtUnmapViewOfSection(hProcess, ::GetModuleHandleW(L"ntdll.dll"));
 	return TRUE;
 }
+
+int CLProcess::GetCpuUsageByPid(_In_ DWORD dwPid, _In_ _Out_ LONGLONG& llLastTime, _In_ _Out_ LONGLONG& llLastSysTime)
+{
+	static int nCpuKernelCount = -1;
+	if (nCpuKernelCount == -1)
+	{
+		SYSTEM_INFO SysInfo;
+		::GetSystemInfo(&SysInfo);
+		nCpuKernelCount = static_cast<int>(SysInfo.dwNumberOfProcessors);
+	}
+
+
+	auto file_time_2_utc = [](const FILETIME* ftime)
+	{
+		LARGE_INTEGER li;
+
+		li.LowPart = ftime->dwLowDateTime;
+		li.HighPart = ftime->dwHighDateTime;
+		return li.QuadPart;
+	};
+
+	FILETIME now;
+	FILETIME creation_time;
+	FILETIME exit_time;
+	FILETIME kernel_time;
+	FILETIME user_time;
+	int64_t system_time;
+	int64_t time;
+	int64_t system_time_delta;
+	int64_t time_delta;
+
+	int cpu = -1;
+
+	GetSystemTimeAsFileTime(&now);
+
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, ::GetCurrentProcessId());
+	if (!GetProcessTimes(hProcess, &creation_time, &exit_time, &kernel_time, &user_time))
+		return -1;
+
+	system_time = (file_time_2_utc(&kernel_time) + file_time_2_utc(&user_time)) / nCpuKernelCount;
+	time = file_time_2_utc(&now);
+
+	if ((llLastTime == 0) || (llLastSysTime == 0))
+	{
+		llLastSysTime = system_time;
+		llLastTime = time;
+		return -1;
+	}
+
+	system_time_delta = system_time - llLastSysTime;
+	time_delta = time - llLastTime;
+
+	if (time_delta == 0)
+		return -1;
+
+	cpu = (int)((system_time_delta * 100 + time_delta / 2) / time_delta);
+	llLastSysTime = system_time;
+	llLastTime = time;
+	return cpu;
+}

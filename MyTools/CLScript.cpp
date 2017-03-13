@@ -35,7 +35,7 @@ BOOL CLScript::ReadScriptFile(_In_ cwstring& wsPath)
 			return FALSE;
 		}
 
-		CCharacter::Split(wsContent, L"\r\n", SourceCodeList, Split_Option_RemoveEmptyEntries);
+		CCharacter::Split(wsContent, L"\r\n", SourceCodeList, Split_Option_RemoveEmptyEntries | Split_Option_KeepOnly);
 
 		CLPublic::Vec_erase_if(SourceCodeList, [](CONST std::wstring& wsText){ return wsText.find(L"//") != -1; });
 		return SourceCodeList.size() != 0;
@@ -350,34 +350,29 @@ std::vector<CL_Script_TranCode>::iterator CLScript::GetItr_By_CodeType(_In_ cons
 	return std::find_if(Startitr, ScriptCodeList.end(), [&emCodeType](CL_Script_TranCode& TranCode){ return TranCode.emCodeType == emCodeType; });
 }
 
-BOOL CLScript::Read(_In_ LPCWSTR pwszScriptPath)
-{
-	_CLStackTrace(L"CLScript::Read");
-	if (!ReadScriptFile(pwszScriptPath))
-		return FALSE;
-
-	if (!AnalysisSourceCode())
-	{
-		Release();
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-BOOL CLScript::Read(_In_ CONST std::wstring& wsScriptContent)
+BOOL CLScript::Read(_In_ em_Read_Type emReadType, _In_ CONST std::wstring& wsText)
 {
 	try
 	{
-		if (!ReadScriptContent(wsScriptContent))
-			return FALSE;
-
+		switch (emReadType)
+		{
+		case CLScript::em_Read_Type_Path:
+			if (!ReadScriptFile(wsText))
+				return FALSE;
+			break;
+		case CLScript::em_Read_Type_Content:
+			if (!ReadScriptContent(wsText))
+				return FALSE;
+			break;
+		default:
+			break;
+		}
+		
 		if (!AnalysisSourceCode())
 		{
 			Release();
 			return FALSE;
 		}
-
 		return TRUE;
 	}
 	catch (...)
@@ -427,7 +422,7 @@ BOOL CLScript::ReadScriptContent(_In_ LPCSTR pszScriptContent)
 	{
 		std::wstring wsContent = CCharacter::ASCIIToUnicode(pszScriptContent);
 
-		CCharacter::Split(wsContent, L"\r\n", SourceCodeList, Split_Option_RemoveEmptyEntries);
+		CCharacter::Split(wsContent, L"\r\n", SourceCodeList, Split_Option_RemoveEmptyEntries | Split_Option_KeepOnly);
 
 		CLPublic::Vec_erase_if(SourceCodeList, [](CONST std::wstring& wsText){ return wsText.find(L"//") != -1; });
 		return SourceCodeList.size() != 0;
@@ -443,7 +438,7 @@ BOOL CLScript::ReadScriptContent(_In_ cwstring& wsContent)
 {
 	try
 	{
-		CCharacter::Split(wsContent, L"\r\n", SourceCodeList, Split_Option_RemoveEmptyEntries);
+		CCharacter::Split(wsContent, L"\r\n", SourceCodeList, Split_Option_RemoveEmptyEntries | Split_Option_KeepOnly);
 
 		CLPublic::Vec_erase_if(SourceCodeList, [](CONST std::wstring& wsText){ return wsText.find(L"//") != -1; });
 		return SourceCodeList.size() != 0;
