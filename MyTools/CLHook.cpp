@@ -21,7 +21,8 @@ BOOL CLHook::Hook_Fun_Jmp_MyAddr(MYHOOK_CONTENT* pHookContent)
 {
 	__try
 	{
-		PrintDebug_W(pHookContent == nullptr, L"pHookContent=NULL");
+		if (pHookContent == nullptr)
+			return FALSE;
 
 		// 初始化变量
 		BYTE bJmpFlag = 0xE9;
@@ -115,7 +116,7 @@ int WINAPI NEW_MessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uTyp
 	return ret;
 }
 
-BOOL CLHook::Hook_API_Redirect(IN LPCSTR pszDllName, IN LPCSTR pszFunName, IN DWORD dwNewProc, OUT PHOOK_ITEM pItem)
+BOOL CLHook::Hook_API_Redirect(IN LPCSTR, IN LPCSTR, IN DWORD, OUT PHOOK_ITEM)
 {
 	return FALSE;
 }

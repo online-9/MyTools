@@ -96,7 +96,6 @@ BOOL CLSearchBase::SearchBase(LPCSTR szCode, DWORD * pArray, UINT& puLen, LPCWST
 		return FALSE;
 	}
 
-	int nCount = 0;
 	DWORD * pCode = new DWORD[uCodeLen];
 	memset(pCode, 0, uCodeLen);
 

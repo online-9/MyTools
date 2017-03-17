@@ -28,7 +28,7 @@ private:
 	unsigned char InvSbox[256];
 	unsigned char w[11][4][4];
 
-	void KeyExpansion(unsigned char* key, unsigned char w[][4][4]);
+	void KeyExpansion(unsigned char* key);
 	unsigned char FFmul(unsigned char a, unsigned char b);
 
 	void SubBytes(unsigned char state[][4]);

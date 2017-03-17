@@ -239,7 +239,8 @@ public:
 
 	ByteBuffer &operator>>(string &value){
 		value.clear();
-		while (true){
+		for (;;)
+		{
 			char c = read<char>();
 			if (c == 0)
 				break;
@@ -250,7 +251,7 @@ public:
 
 	ByteBuffer &operator>>(wstring &value){
 		value.clear();
-		while (true){
+		for (;;){
 			wchar_t c = read<wchar_t>();
 			if (c == 0)
 				break;

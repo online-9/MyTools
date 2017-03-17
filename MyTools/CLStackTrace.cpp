@@ -21,14 +21,14 @@ VOID CLStackGroup::InstallStackTracer(_In_ CONST std::wstring& wsStackTracerName
 
 VOID CLStackGroup::UnInstallStackTracer()
 {
-	auto& itr = ThreadStackMap.find(::GetCurrentThreadId());
+	auto itr = ThreadStackMap.find(::GetCurrentThreadId());
 	if (itr != ThreadStackMap.end())
 		ThreadStackMap.erase(itr);
 }
 
 VOID CLStackGroup::Push(_In_ DWORD dwThreadId, _In_ CONST std::wstring& wsFunName, _In_ CONST std::wstring& wsFileName, _In_ int nLine)
 {
-	auto& itm = ThreadStackMap.find(dwThreadId);
+	auto itm = ThreadStackMap.find(dwThreadId);
 	if (itm == ThreadStackMap.end())
 		return;
 
@@ -38,7 +38,7 @@ VOID CLStackGroup::Push(_In_ DWORD dwThreadId, _In_ CONST std::wstring& wsFunNam
 
 VOID CLStackGroup::Pop(_In_ DWORD dwThreadId)
 {
-	auto& itm = ThreadStackMap.find(dwThreadId);
+	auto itm = ThreadStackMap.find(dwThreadId);
 	if (itm == ThreadStackMap.end())
 		return;
 
@@ -48,7 +48,7 @@ VOID CLStackGroup::Pop(_In_ DWORD dwThreadId)
 
 UINT CLStackGroup::CopyThreadStackContent(_In_ DWORD dwThreadId, _Out_ std::stack<FunctionStackContent>& FunStaackContentStack)
 {
-	auto& itr = ThreadStackMap.find(dwThreadId);
+	auto itr = ThreadStackMap.find(dwThreadId);
 	if (itr == ThreadStackMap.end())
 		return 0;
 

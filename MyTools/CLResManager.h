@@ -18,6 +18,7 @@ public:
 		m_fnDeletePtr(m_ResHandle);
 	}
 
+	CLResManager& operator=(CONST CLResManager&) = delete;
 private:
 	ResHandle& m_ResHandle;
 	Deleter m_fnDeletePtr;

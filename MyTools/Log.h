@@ -16,6 +16,7 @@
 #define LOG_FC(Type,FormatText,...) LOG_CF(Type, FormatText, __VA_ARGS__)
 #define LOG_MSG_CF(Type,FormatText,...) CLog::GetInstance().Print(__FUNCTIONW__, _SELF, __LINE__, LOG_TYPE_CONSOLE, Type, TRUE, FormatText, __VA_ARGS__)
 #define LOG_CF_D(FormatText,...)	LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug,FormatText, __VA_ARGS__)
+#define LOG_C_D(FormatText,...)		LOG_C(CLog::em_Log_Type::em_Log_Type_Debug,FormatText, __VA_ARGS__)
 
 class CLog : public virtual CClassInstance<CLog>
 {

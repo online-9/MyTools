@@ -177,7 +177,7 @@ BOOL CLScript::AnalysisCode_ExcuteFun(_In_ cwstring& wsText, __out LPVOID& pAddr
 	else if (vlst.size() == 1 && vParm.size() == 0)
 		vParm.push_back(L"");
 
-	for (auto& itr = vParm.begin(); itr != vParm.end() && vlst.size() != 0; ++itr)
+	for (auto itr = vParm.begin(); itr != vParm.end() && vlst.size() != 0; ++itr)
 	{
 		if (*itr == L"")
 		{
@@ -221,6 +221,9 @@ BOOL CLScript::ExcuteFunction(_In_ cwstring& wsName, _In_ std::vector<CL_Script_
 	CL_Script_CustomeFunction CL_Script_CustomeFunction_;
 	if (!IsExistCustomeFunAddrList(wsName, CL_Script_CustomeFunction_))
 	{
+		for (CONST auto& itm : CustomeFunAddrList)
+			Log(LOG_LEVEL_EXCEPTION, L"CustomeFun:%s", itm.wsFunName.c_str());
+
 		LogMsgBox(LOG_LEVEL_EXCEPTION, L"Can't Find Function:%s", wsName.c_str());
 		return FALSE;
 	}
@@ -306,14 +309,15 @@ BOOL CLScript::IsExistScriptFunAddrList(_In_ cwstring& wsFunname, _Out_opt_ CL_S
 {
 	BOOL bRetCode = FALSE;
 
-	auto& itr = std::find_if(ScriptCodeList.begin(), ScriptCodeList.end(), [&wsFunname](CONST CL_Script_TranCode& CL_Script_TranCode_){
+	auto p = CLPublic::Vec_find_if(ScriptCodeList, [&wsFunname](CONST CL_Script_TranCode& CL_Script_TranCode_)
+	{
 		return (CL_Script_TranCode_.emCodeType == em_CL_Script_Code_Type_DefineFun && ((CL_Script_TranCode_DefineFun *)CL_Script_TranCode_.pStruct)->wsFunName == wsFunname);
 	});
 
-	if (itr != ScriptCodeList.end())
+	if (p != nullptr)
 	{
 		bRetCode = TRUE;
-		CL_Script_TranCode_DefineFun_ = *(CL_Script_TranCode_DefineFun *)itr->pStruct;
+		CL_Script_TranCode_DefineFun_ = *(CL_Script_TranCode_DefineFun *)p->pStruct;
 	}
 
 	return bRetCode;
@@ -323,20 +327,17 @@ BOOL CLScript::IsExistCustomeFunAddrList(_In_ cwstring& wsFunname, _Out_opt_ CL_
 {
 	BOOL bRetCode = FALSE;
 
-	auto& itr = std::find_if(CustomeFunAddrList.begin(), CustomeFunAddrList.end(), [&wsFunname](CL_Script_CustomeFunction& Cf){
-		return Cf.wsFunName == wsFunname;
-	});
-
-	if (itr != CustomeFunAddrList.end())
+	auto p = CLPublic::Vec_find_if(CustomeFunAddrList, [&wsFunname](CL_Script_CustomeFunction& Cf){return Cf.wsFunName == wsFunname; });
+	if (p != nullptr)
 	{
-		CL_Script_CustomeFunction_ = *itr;
+		CL_Script_CustomeFunction_ = *p;
 		bRetCode = TRUE;
 	}
 
 	return bRetCode;
 }
 
-BOOL CLScript::ExcuteCode_If(_In_ std::vector<CL_Script_TranCode>::iterator CodeItr, _In_ BOOL bResult)
+BOOL CLScript::ExcuteCode_If(_In_ std::vector<CL_Script_TranCode>::iterator, _In_ BOOL)
 {
 	/*for (auto itr = CodeItr + 1; itr != ScriptCodeList.end(); ++itr)
 	{

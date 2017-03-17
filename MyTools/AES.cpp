@@ -44,7 +44,7 @@ AES::AES(unsigned char* key)
 	};
 	memcpy(Sbox, sBox, 256);
 	memcpy(InvSbox, invsBox, 256);
-	KeyExpansion(key, w);
+	KeyExpansion(key);
 }
 
 AES::~AES()
@@ -149,7 +149,7 @@ void* AES::InvCipher(void* input, int length)
 	return input;
 }
 
-void AES::KeyExpansion(unsigned char* key, unsigned char w[][4][4])
+void AES::KeyExpansion(unsigned char* key)
 {
 	int i, j, r, c;
 	unsigned char rc[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36 };

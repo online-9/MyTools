@@ -61,7 +61,7 @@ VOID CLPublic::GetCRC32(IN LPSTR inStr, IN UINT uSize, OUT LPSTR OutStr)
 	sprintf_s(value, _countof(value) - 1, "%X", crc ^ 0xFFFFFFFF);
 	for (int i = 0; i < 10; ++i)
 	{
-		value[i] = toupper(value[i]);
+		value[i] = static_cast<char>(toupper(value[i]));
 	}
 	//strcpy(inStr, value);
 	CCharacter::strcpy_my(OutStr, value, strlen(value));
@@ -85,7 +85,7 @@ VOID CLPublic::GetCRC32_DWORD(IN LPCSTR inStr, IN UINT uSize, OUT DWORD& OutValu
 	sprintf_s(value, _countof(value) - 1, "%X", crc ^ 0xFFFFFFFF);
 	for (int i = 0; i < 10; ++i)
 	{
-		value[i] = toupper(value[i]);
+		value[i] = static_cast<char>(toupper(value[i]));
 	}
 	//strcpy(inStr, value);
 	CCharacter::strcpy_my(szCrc, value, strlen(value));
@@ -131,7 +131,7 @@ VOID CLPublic::GetCRC32_Long(IN LPSTR inStr, IN LONG lgSize, OUT LPSTR OutStr)
 	sprintf_s(value, _countof(value) - 1, "%X", crc ^ 0xFFFFFFFF);
 	for (int i = 0; i < 10; ++i)
 	{
-		value[i] = toupper(value[i]);
+		value[i] = static_cast<char>(toupper(value[i]));
 	}
 	//strcpy(inStr, value);
 	CCharacter::strcpy_my(OutStr, value, strlen(value));
@@ -305,12 +305,10 @@ BOOL CLPublic::SendKeys(const char* data)
 
 BOOL CLPublic::ForceExit()
 {
-	BOOL bRetCode = FALSE;
 	CONTEXT ct = { 0 };
-
-
 	DWORD dwMainThreadId = CLThread::GetMainThreadId();
-	TL_EXIT_ERROR(dwMainThreadId);
+	if (dwMainThreadId == NULL)
+		return FALSE;
 	
 	HANDLE hThread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, dwMainThreadId);
 	if (hThread == NULL)
@@ -320,9 +318,7 @@ BOOL CLPublic::ForceExit()
 	GetThreadContext(hThread, &ct);
 	ct.Eip = NULL;//«ø÷∆±¿¿£
 	::SetThreadContext(hThread, &ct);
-	bRetCode = TRUE;
-Function_Exit:;
-	return bRetCode;
+	return TRUE;
 }
 
 BOOL CLPublic::FileExit(LPCWSTR pwchPath)

@@ -44,7 +44,7 @@ BOOL CLPic::ScreenShot(_In_ HWND hWnd, _In_ CONST std::wstring& wsPath) CONST
 	}
 	SetResDeleter(hBitmap, [](HBITMAP& hBitmap){ ::DeleteObject(hBitmap); });
 
-	HBITMAP hOldBitmap = (HBITMAP)::SelectObject(hMemDC, hBitmap);
+	/*HBITMAP hOldBitmap = */(HBITMAP)::SelectObject(hMemDC, hBitmap);
 	::BitBlt(hMemDC, 0, 0, uWidth, uHeight, hSrcDC, 0, 0, SRCCOPY);
 
 	BITMAP bitmap = { 0 };

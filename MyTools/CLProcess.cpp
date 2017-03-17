@@ -134,7 +134,8 @@ BOOL CLProcess::GetProcessModule_For_Name(__in LPCWSTR pwchProcName, __in LPCWST
 {
 	DWORD dwPid = GetPid_For_ProcName(pwchProcName);
 	HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPid);
-	TL_EXIT_ERROR(hModuleSnap != INVALID_HANDLE_VALUE);
+	if (hModuleSnap == NULL)
+		return FALSE;
 
 
 	me32.dwSize = sizeof(MODULEENTRY32W);
@@ -153,8 +154,6 @@ BOOL CLProcess::GetProcessModule_For_Name(__in LPCWSTR pwchProcName, __in LPCWST
 			return TRUE;
 		}
 	} while (Module32NextW(hModuleSnap, &me32));
-
-Function_Exit:;
 	return FALSE;
 }
 
@@ -339,27 +338,52 @@ BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
 
 	// Debug Privilige
 	HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPid);
-	PrintDebug_W(hProcess == NULL, L"OpenProcess Faild!");
+	if (hProcess == NULL)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"OpenProcess Faild!");
+		return FALSE;
+	}
 
 	DWORD dwDLLSize = (wcslen(pwszDllPath) + 1) * 2;
 
 	// Alloc in Target Process
 	LPVOID pAllocMem = VirtualAllocEx(hProcess, NULL, dwDLLSize, MEM_COMMIT, PAGE_READWRITE);
-	PrintDebug_W(pAllocMem == NULL, L"VirtualAllocEx in Target Process Faild!");
+	if (pAllocMem == nullptr)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"VirtualAllocEx in Target Process Faild!");
+		return FALSE;
+	}
 
 	//将DLL的路径名复制到远程进程的地址空间  
 	BOOL bRetCode = WriteProcessMemory(hProcess, (PVOID)pAllocMem, (PVOID)pwszDllPath, dwDLLSize, NULL);
-	PrintDebug_W(!bRetCode, L"WriteProcessMemory Faild!");
+	if (!bRetCode)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"WriteProcessMemory Faild!");
+		return FALSE;
+	}
 
 	//获得LoadLibraryA在Kernel.dll中得真正地址  
 	HMODULE hmKernel32 = ::GetModuleHandle(TEXT("Kernel32"));
-	PrintDebug_W(hmKernel32 == NULL, L"WriteProcessMemory Faild!");
+	if (hmKernel32 == NULL)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"GetModuleHandle 'Kernel32' Faild!");
+		return FALSE;
+	}
 
 	PTHREAD_START_ROUTINE pfnThreadRrn = (PTHREAD_START_ROUTINE)GetProcAddress(hmKernel32, "LoadLibraryW");
-	PrintDebug_W(pfnThreadRrn == NULL,  L"pfnThreadRrn == NULL");
+	if (pfnThreadRrn == NULL)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"pfnThreadRrn = NULL");
+		return FALSE;
+	}
 
 	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, pfnThreadRrn, (PVOID)pAllocMem, 0, NULL);
-	PrintDebug_W(hThread == NULL, L"hThread = NULL");
+	if (hThread == NULL)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"hThread = NULL");
+		return FALSE;
+	}
+
 	//等待远程线程终止  
 	WaitForSingleObject(hThread, INFINITE);
 
@@ -408,21 +432,41 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 	*/
 
 	//PrintDebug_W(CLPublic::FileExit(pwszProcPath), _SELF, __LINE__, L"UnExist Process Path:%s", pwszProcPath);
-	PrintDebug_W(!CLPublic::FileExit(pwszDLLPath), L"UnExist Injector DLL Path:%s", pwszDLLPath);
+	if (!CLPublic::FileExit(pwszDLLPath))
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"UnExist Injector DLL Path:%s", pwszDLLPath);
+		return FALSE;
+	}
+
 	// CreateProcessW Parm 2 will Update Parm
 	CCharacter::wstrcpy_my(wszProcPath, pwszProcPath, _countof(wszProcPath) - 1);
 
 	// Set Current Dirctory
 	CCharacter::wstrcpy_my(wszProcDirectory, pwszProcPath, _countof(wszProcDirectory) - 1);
 
-	PrintDebug_W(!PathRemoveFileSpecW(wszProcDirectory), L"Can't Get Process Work Directory in Process Path");
-	PrintDebug_W(!::CreateProcessW(NULL, wszProcPath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi), L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
+
+	if (!PathRemoveFileSpecW(wszProcDirectory))
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"Can't Get Process Work Directory in Process Path");
+		return FALSE;
+	}
+
+
+	if (!::CreateProcessW(NULL, wszProcPath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
+		return FALSE;
+	}
 
 	// Injector DLL
 	Context.ContextFlags = CONTEXT_INTEGER;
 	GetThreadContext(pi.hThread, &Context);
 	Buffer = ::VirtualAllocEx(pi.hProcess, NULL, sizeof(SHELL_CODE), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	PrintDebug_W(Buffer == NULL,  L"VirtualAllocEx = NULL");
+	if (Buffer == NULL)
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"VirtualAllocEx = NULL");
+		return FALSE;
+	}
 
 	*(DWORD*)(szShellCode + 2) = (DWORD)Buffer;
 	*(DWORD*)(szShellCode + 7) = (DWORD)LoadLibraryA;
@@ -432,7 +476,11 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 	CopyMemory(((PSHELL_CODE)&ShellCode)->szPath, strDllPath.c_str(), strDllPath.length());
 	CopyMemory(((PSHELL_CODE)&ShellCode)->szInstruction, szShellCode, sizeof(szShellCode));
 
-	PrintDebug_W(!WriteProcessMemory(pi.hProcess, Buffer, &ShellCode, sizeof(SHELL_CODE), &NumberOfBytesWritten), L"WriteProcessMemory ShellCode Fiald!");
+	if (!WriteProcessMemory(pi.hProcess, Buffer, &ShellCode, sizeof(SHELL_CODE), &NumberOfBytesWritten))
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"WriteProcessMemory ShellCode Fiald!");
+		return FALSE;
+	}
 
 	Context.Eax = (DWORD)(((PSHELL_CODE)Buffer)->szInstruction);
 	SetThreadContext(pi.hThread, &Context);
@@ -479,7 +527,11 @@ BOOL CLProcess::CreateProcess_InjectorRemoteDLL(__in LPCWSTR pwszProcPath, __in 
 
 	// CreateProcessW Parm 2 will Update Parm
 	CCharacter::wstrcpy_my(wszProcPath, pwszProcPath, _countof(wszProcPath) - 1);
-	PrintDebug_W(!::CreateProcessW(NULL, wszProcPath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi), L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
+	if (!::CreateProcessW(NULL, wszProcPath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
+	{
+		Log(LOG_LEVEL_EXCEPTION, L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
+		return FALSE;
+	}
 
 	if (pwszDLLPath != nullptr && CLPublic::FileExit(pwszDLLPath))
 		LoadRemoteDLL(pi.dwProcessId, pwszDLLPath);
@@ -494,7 +546,9 @@ BOOL CLProcess::CreateProcess_InjectorRemoteDLL(__in LPCWSTR pwszProcPath, __in 
 BOOL CLProcess::ExistProcModule_By_ID(_In_ DWORD dwProcId, _In_ LPCWSTR pwchModuleName)
 {
 	HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcId);
-	TL_EXIT_ERROR(hModuleSnap != INVALID_HANDLE_VALUE);
+	if (hModuleSnap == INVALID_HANDLE_VALUE)
+		return FALSE;
+
 
 	MODULEENTRY32W me32;
 	me32.dwSize = sizeof(MODULEENTRY32W);
@@ -503,6 +557,7 @@ BOOL CLProcess::ExistProcModule_By_ID(_In_ DWORD dwProcId, _In_ LPCWSTR pwchModu
 		::CloseHandle(hModuleSnap);
 		return FALSE;
 	}
+
 
 	//遍历所有模块,找到所需的模块
 	do
@@ -513,8 +568,6 @@ BOOL CLProcess::ExistProcModule_By_ID(_In_ DWORD dwProcId, _In_ LPCWSTR pwchModu
 			return TRUE;
 		}
 	} while (Module32NextW(hModuleSnap, &me32));
-
-Function_Exit:;
 	return FALSE;
 }
 
@@ -594,7 +647,7 @@ int CLProcess::GetCpuUsageByPid(_In_ DWORD dwPid, _In_ _Out_ LONGLONG& llLastTim
 
 	GetSystemTimeAsFileTime(&now);
 
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, ::GetCurrentProcessId());
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, dwPid);
 	if (!GetProcessTimes(hProcess, &creation_time, &exit_time, &kernel_time, &user_time))
 		return -1;
 

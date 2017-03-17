@@ -103,13 +103,13 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	wsClientName = cwsClientName;
 	bRun = TRUE;
 	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
-	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
+	SetResDeleter(hWorkThread, [](HANDLE& hThread){::CloseHandle(hThread); });
 
 	auto hSendThread = cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
-	SetResDeleter(hSendThread, [](HANDLE& hThread) { ::CloseHandle(hThread); });
+	SetResDeleter(hSendThread, [](HANDLE& hThread){ ::CloseHandle(hThread); });
 
 	auto hSaveThread = cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
-	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
+	SetResDeleter(hSaveThread, [](HANDLE& hThread){::CloseHandle(hThread); });
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
@@ -206,7 +206,7 @@ BOOL CLog::SaveLog(_In_ LogContent& LogContent_)
 	{
 		// have to create new log!
 		WCHAR wszFileName[64];
-		swprintf_s(wszFileName, _countof(wszFileName), L"%s_%d-%d-%d.log", wsClientName.c_str(), SysTime.wYear, SysTime.wMonth, SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond);
+		swprintf_s(wszFileName, _countof(wszFileName), L"%s_%d-%d-%d.log", wsClientName.c_str(), SysTime.wYear, SysTime.wMonth, SysTime.wDay);
 
 		CCharacter::wstrcpy_my(wszText, wsLogFilePath.c_str(), _countof(wszText));
 		::PathRemoveFileSpec(wszText);
@@ -372,7 +372,7 @@ DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
 		return 0;
 	}
 
-
+	
 	while (pTestLog->bRun)
 	{
 		::SetEvent(hReadyEvent);

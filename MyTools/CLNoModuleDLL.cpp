@@ -45,7 +45,7 @@ BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFil
 		return FALSE;
 	}
 
-	PVOID pBase = pFileBuff;
+	//PVOID pBase = pFileBuff;
 
 	//ÅÐ¶ÏÊÇ·ñÊÇPE
 	PIMAGE_DOS_HEADER pIDH = (PIMAGE_DOS_HEADER)pFileBuff;
@@ -90,8 +90,8 @@ BOOL CLNoModuleDLL::PELoader(char *lpStaticPEBuff, PVOID& pExecuMem)
 
 	memcpy(lpDynPEBuff, lpStaticPEBuff, pISH->VirtualAddress);
 
-	long lFileAlignMask = pINH->OptionalHeader.FileAlignment - 1;
-	long lSectionAlignMask = pINH->OptionalHeader.SectionAlignment - 1;
+	//long lFileAlignMask = pINH->OptionalHeader.FileAlignment - 1;
+	//long lSectionAlignMask = pINH->OptionalHeader.SectionAlignment - 1;
 
 	for (int nIndex = 0; nIndex < lSectionNum; nIndex++, pISH++)
 	{

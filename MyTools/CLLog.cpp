@@ -94,9 +94,10 @@ BOOL CLLog::SetClientName(_In_ CONST std::wstring& wsClientName)
 
 BOOL CLLog::PrintLogTo(_In_ _LogContent& LogContent)
 {
+	SaveLog(LogContent);
 	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CLLOG_MUTEX); // wait for LogServer
 	if (hMutex == NULL)
-		return SaveLog(LogContent);
+		return TRUE;
 
 	::CloseHandle(hMutex);
 	hMutex = NULL;
