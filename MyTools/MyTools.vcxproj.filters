@@ -25,9 +25,6 @@
     <Filter Include="AnalysisExpression">
       <UniqueIdentifier>{9cab2602-500d-4d5b-88ed-9053a7df78e6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script">
-      <UniqueIdentifier>{907da649-50c0-4c29-8923-9c385ca94de4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Socket">
       <UniqueIdentifier>{7909267a-f3c0-41f3-a025-32e137d9f2fa}</UniqueIdentifier>
     </Filter>
@@ -63,6 +60,9 @@
     </Filter>
     <Filter Include="File">
       <UniqueIdentifier>{8aaa1ea9-d051-42cb-a21c-3dfb19ffad14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Character\Script">
+      <UniqueIdentifier>{907da649-50c0-4c29-8923-9c385ca94de4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,10 +130,13 @@
       <Filter>Pic</Filter>
     </ClCompile>
     <ClCompile Include="CLScript.cpp">
-      <Filter>Script</Filter>
+      <Filter>Character\Script</Filter>
     </ClCompile>
     <ClCompile Include="CLFile.cpp">
       <Filter>File</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>Character\Script</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,10 +225,13 @@
       <Filter>Res</Filter>
     </ClInclude>
     <ClInclude Include="CLScript.h">
-      <Filter>Script</Filter>
+      <Filter>Character\Script</Filter>
     </ClInclude>
     <ClInclude Include="CLFile.h">
       <Filter>File</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.h">
+      <Filter>Character\Script</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
