@@ -286,14 +286,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
-			// Remove Last One!
-			RemoveQueue();
-
-			// Excute Again 'while'
-			AddExcuteQueue(wsMethodName, ScriptCode_.ulCodeHash);
-
-			// Excute 'while(..CALLBACK)' -> CALLBACK();
-			AddExcuteQueue(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, NULL);
+			ExcuteLoop(ScriptCode_);
 			return TRUE;
 		}
 		break;
@@ -314,6 +307,18 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		break;
 	}
 	return TRUE;
+}
+
+VOID MyTools::CScript::ExcuteLoop(_In_ CONST Script_Code& ScriptCode_)
+{
+	// Remove Last One!
+	RemoveQueue();
+
+	// Excute Again 'while'
+	AddExcuteQueue(static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode)->wsMethodName, ScriptCode_.ulCodeHash);
+
+	// Excute 'while(..CALLBACK)' -> CALLBACK();
+	AddExcuteQueue(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, NULL);
 }
 
 BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Script_Code_Method* pCodeMethod)

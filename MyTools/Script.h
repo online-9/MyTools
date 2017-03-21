@@ -157,6 +157,8 @@ namespace MyTools
 
 		BOOL ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _In_ CONST Script_Code& ScriptCode_);
 
+		VOID ExcuteLoop(_In_ CONST Script_Code& ScriptCode_);
+
 		BOOL ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Script_Code_Method* pCodeMethod);
 
 		VOID AddExcuteQueue(_In_ CONST std::wstring& wsMethodName, _In_ ULONG ulHash = NULL);
@@ -166,6 +168,7 @@ namespace MyTools
 		CONST Script_Code_DefMethod* ExistDefMethod(_In_ CONST std::wstring& wsMethodName) CONST;
 
 		CONST Script_Code_Custome_Method* ExistCustMethod(_In_ CONST std::wstring& wsMethodName) CONST;
+
 	private:
 		BOOL AnalysisCode_DefMethod(_In_ CONST std::wstring& wsContent, _Out_ Script_Code_DefMethod& DefMethodContent_) CONST;
 
