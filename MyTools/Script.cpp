@@ -12,6 +12,7 @@ MyTools::CScript::CScript()
 	_fnIfPtr = nullptr;
 	_fnWhilePtr = nullptr;
 	_pCurrentMethodContent = nullptr;
+	_pCurrentScriptCode = nullptr;
 }
 
 MyTools::CScript::~CScript()
@@ -252,7 +253,7 @@ BOOL MyTools::CScript::ExcuteDefMethod(_In_ CONST std::wstring& wsMethodName, _I
 		{
 			// Excute Next Code
 			AddExcuteQueue(wsMethodName, p->VecScriptCode.at(i + 1).ulCodeHash);
-
+			_pCurrentScriptCode = &p->VecScriptCode.at(i);
 			return ExcuteScriptCode(wsMethodName, p->VecScriptCode.at(i));
 		}
 	}

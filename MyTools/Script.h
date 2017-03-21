@@ -183,6 +183,7 @@ namespace MyTools
 		std::function<BOOL(CONST Script_Code_If&)> _fnIfPtr;
 		std::function<BOOL(CONST Script_Code_If&)> _fnWhilePtr;
 		CONST Script_Code_Method* _pCurrentMethodContent;
+		CONST Script_Code* _pCurrentScriptCode;
 	};
 
 }
