@@ -286,7 +286,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
-			ExcuteLoop(ScriptCode_);
+			ExcuteLoop(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, ScriptCode_);
 			return TRUE;
 		}
 		break;
