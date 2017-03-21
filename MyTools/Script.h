@@ -157,7 +157,7 @@ namespace MyTools
 
 		BOOL ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _In_ CONST Script_Code& ScriptCode_);
 
-		VOID ExcuteLoop(_In_ CONST Script_Code& ScriptCode_);
+		VOID ExcuteLoop(_In_ CONST std::wstring& wsExcuteMethodName, _In_ CONST Script_Code& CurrentScriptCode_);
 
 		BOOL ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Script_Code_Method* pCodeMethod);
 
