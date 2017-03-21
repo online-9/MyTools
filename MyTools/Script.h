@@ -40,19 +40,19 @@ namespace MyTools
 		{
 			std::wstring					wsValue;
 
-			DWORD ConvertDWORD()
+			DWORD ConvertDWORD() CONST
 			{
 				return static_cast<DWORD>(wcstol(wsValue.c_str(), NULL, 16));
 			}
-			DWORD ConvertDWORD_By_Dec()
+			DWORD ConvertDWORD_By_Dec() CONST
 			{
 				return static_cast<DWORD>(_wtoi(wsValue.c_str()));
 			}
-			float  ConvertFLOAT()
+			float  ConvertFLOAT() CONST
 			{
 				return static_cast<float>(_wtof(wsValue.c_str()));
 			}
-			CONST std::wstring& GetString()
+			CONST std::wstring& GetString() CONST
 			{
 				return wsValue;
 			}
