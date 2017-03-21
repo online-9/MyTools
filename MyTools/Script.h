@@ -80,7 +80,7 @@ namespace MyTools
 		struct Script_Code_If : public Script_Code_Type
 		{
 			std::wstring				wsCondition;
-			std::vector<std::wstring>	VecValue;
+			std::vector<Script_Code_MethodParameter>	VecValue;
 			std::wstring				wsMethodName;
 
 			Script_Code_If()
@@ -106,7 +106,7 @@ namespace MyTools
 			std::wstring					wsMethodName;
 		};
 
-		typedef std::function<BOOL(CONST Script_Code_Method&)> DefScriptMethod;
+		typedef std::function<BOOL()> DefScriptMethod;
 		struct Script_Code_Custome_Method
 		{
 			std::wstring				wsMethodName;
@@ -182,6 +182,7 @@ namespace MyTools
 		std::function<VOID(CONST std::wstring&, int nLine, CONST std::wstring&)> _fnLogPtr;
 		std::function<BOOL(CONST Script_Code_If&)> _fnIfPtr;
 		std::function<BOOL(CONST Script_Code_If&)> _fnWhilePtr;
+		CONST Script_Code_Method* _pCurrentMethodContent;
 	};
 
 }

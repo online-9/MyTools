@@ -11,6 +11,7 @@ MyTools::CScript::CScript()
 	_fnExceptionPtr = nullptr;
 	_fnIfPtr = nullptr;
 	_fnWhilePtr = nullptr;
+	_pCurrentMethodContent = nullptr;
 }
 
 MyTools::CScript::~CScript()
@@ -234,6 +235,11 @@ BOOL MyTools::CScript::ExcuteDefMethod(_In_ CONST std::wstring& wsMethodName, _I
 		// Excute '{'
 		//if (!ExcuteScriptCode(wsMethodName, p->VecScriptCode.at(0))) 
 		//	return FALSE;
+		if (p->VecScriptCode.size() < 2)
+		{
+			PrintLog(__LINE__, L"VecScriptCode.size()=%d and < 2, MethodName=%s", p->VecScriptCode.size(), wsMethodName.c_str());
+			return FALSE;
+		}
 
 		// Excute Next Code
 		AddExcuteQueue(wsMethodName, p->VecScriptCode.at(1).ulCodeHash);
@@ -265,7 +271,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 			PrintLog(__LINE__, L"Not Declare Method if Ptr!!!");
 			return FALSE;
 		}
-		if (_fnIfPtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
+		else if (_fnIfPtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
 			AddExcuteQueue(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, NULL);
 			return TRUE;
@@ -277,7 +283,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 			PrintLog(__LINE__, L"Not Declare Method While Ptr!!!");
 			return FALSE;
 		}
-		if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
+		else if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
 			// Remove Last One!
 			RemoveQueue();
@@ -317,7 +323,8 @@ BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Scr
 		__try
 		{
 			Log(LOG_LEVEL_NORMAL, L"Ö´ÐÐº¯Êý:%s", p->wsMethodName.c_str());
-			return p->MethodPtr(*pCodeMethod);
+			_pCurrentMethodContent = pCodeMethod;
+			return p->MethodPtr();
 		}
 		__except (CLLog::PrintExceptionCode(GetExceptionInformation()))
 		{
@@ -459,9 +466,10 @@ BOOL MyTools::CScript::AnalysisCode_If(_In_ em_Script_CodeType emScriptCodeType_
 			return FALSE;
 		}
 
-		CCharacter::Split(VecText.at(0), L",", pScriptCodeIf->VecValue, Split_Option_RemoveEmptyEntries | Split_Option_KeepOnly);
-		for (auto& itm : pScriptCodeIf->VecValue)
-			CCharacter::Trim_W(itm);
+		std::vector<std::wstring> VecValue;
+		CCharacter::Split(VecText.at(0), L",", VecValue, Split_Option_RemoveEmptyEntries | Split_Option_KeepOnly);
+		for (auto& itm : VecValue)
+			pScriptCodeIf->VecValue.push_back(Script_Code_MethodParameter(CCharacter::Trim_W(itm)));
 
 		CCharacter::GetRemoveRight(Text, L",", Text);
 	}
