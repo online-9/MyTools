@@ -286,7 +286,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
-			ExcuteLoop(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, ScriptCode_);
+			ExcuteLoop(wsMethodName, ScriptCode_);
 			return TRUE;
 		}
 		break;
@@ -309,16 +309,28 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 	return TRUE;
 }
 
-VOID MyTools::CScript::ExcuteLoop(_In_ CONST std::wstring& wsExcuteMethodName, _In_ CONST Script_Code& CurrentScriptCode_)
+VOID MyTools::CScript::ExuteExtendLoop(_In_ CONST std::wstring& wsExcuteMethodName, _In_ CONST Script_Code& CurrentScriptCode_)
+{
+	// Remove Last One!
+	RemoveQueue();
+
+	// Excute Again Method
+	AddExcuteQueue(static_cast<CONST Script_Code_Method *>(CurrentScriptCode_.pCode)->wsMethodName, CurrentScriptCode_.ulCodeHash);
+
+	// Excute DefMethod
+	AddExcuteQueue(wsExcuteMethodName, NULL);
+}
+
+VOID MyTools::CScript::ExcuteLoop(_In_ CONST std::wstring& wsMethodName, _In_ CONST Script_Code& CurrentScriptCode_)
 {
 	// Remove Last One!
 	RemoveQueue();
 
 	// Excute Again 'while'
-	AddExcuteQueue(static_cast<CONST Script_Code_Method *>(CurrentScriptCode_.pCode)->wsMethodName, CurrentScriptCode_.ulCodeHash);
+	AddExcuteQueue(wsMethodName, CurrentScriptCode_.ulCodeHash);
 
 	// Excute 'while(..CALLBACK)' -> CALLBACK();
-	AddExcuteQueue(wsExcuteMethodName, NULL);
+	AddExcuteQueue(static_cast<CONST Script_Code_If *>(CurrentScriptCode_.pCode)->wsMethodName, NULL);
 }
 
 BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Script_Code_Method* pCodeMethod)

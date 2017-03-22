@@ -157,7 +157,7 @@ namespace MyTools
 
 		BOOL ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _In_ CONST Script_Code& ScriptCode_);
 
-		VOID ExcuteLoop(_In_ CONST std::wstring& wsExcuteMethodName, _In_ CONST Script_Code& CurrentScriptCode_);
+		VOID ExuteExtendLoop(_In_ CONST std::wstring& wsExcuteMethodName, _In_ CONST Script_Code& CurrentScriptCode_);
 
 		BOOL ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Script_Code_Method* pCodeMethod);
 
@@ -177,6 +177,8 @@ namespace MyTools
 		BOOL AnalysisCode_If(_In_ em_Script_CodeType emScriptCodeType_, _In_ CONST std::wstring& wsContent, _Out_ Script_Code_DefMethod& DefMethodContent_) CONST;
 
 		BOOL AnalysisCode_Method(_In_ CONST std::wstring& wsContent, _Out_ Script_Code_DefMethod& DefMethodContent_) CONST;
+
+		VOID ExcuteLoop(_In_ CONST std::wstring& wsMethodName, _In_ CONST Script_Code& CurrentScriptCode_);
 	protected:
 		std::vector<Script_Code_DefMethod> _VecCode;
 		std::vector<Script_Code_Custome_Method> _VecCustMethod;
