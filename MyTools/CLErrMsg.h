@@ -7,15 +7,15 @@
 class CLErrMsg
 {
 public:
-	struct ErrMsg { DWORD dwThreadId; wstring wsMsg; };
+	struct ErrMsg { DWORD dwThreadId; std::wstring wsMsg; };
 public:
 	CLErrMsg(_In_ LPCWSTR pwszFunName, int nLine, LPCWSTR pwszFormat, ...);
 	~CLErrMsg();
 
 	static BOOL ExistErrMsg();
-	static BOOL GetCurThreadErrMsg(_Out_ vector<wstring>& vErrMsg);
+	static BOOL GetCurThreadErrMsg(_Out_ std::vector<std::wstring>& vErrMsg);
 private:
-	static vector<ErrMsg> vlst;
+	static std::vector<ErrMsg> vlst;
 };
 
 #endif

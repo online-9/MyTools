@@ -2,7 +2,7 @@
 #include "CLErrMsg.h"
 #include <algorithm>
 
-vector<CLErrMsg::ErrMsg> CLErrMsg::vlst;
+std::vector<CLErrMsg::ErrMsg> CLErrMsg::vlst;
 CLErrMsg::CLErrMsg(_In_ LPCWSTR pwszFunName, int nLine, LPCWSTR pwszFormat, ...)
 {
 	va_list		args;
@@ -33,7 +33,7 @@ BOOL CLErrMsg::ExistErrMsg()
 	}) != vlst.end();
 }
 
-BOOL CLErrMsg::GetCurThreadErrMsg(_Out_ vector<wstring>& vErrMsg)
+BOOL CLErrMsg::GetCurThreadErrMsg(_Out_ std::vector<std::wstring>& vErrMsg)
 {
 	DWORD dwThreadId = ::GetCurrentThreadId();
 	for (CONST auto& itm : vlst)
