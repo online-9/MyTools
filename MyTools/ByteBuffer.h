@@ -122,7 +122,7 @@ public:
 		return *this;
 	}
 
-	ByteBuffer &operator<<(const string &value){
+	ByteBuffer &operator<<(const std::string &value){
 		append((BYTE *)value.c_str(), value.length());
 		append((BYTE)0);
 
@@ -136,7 +136,7 @@ public:
 		return *this;
 	}
 
-	ByteBuffer &operator<<(const wstring &value){
+	ByteBuffer &operator<<(const std::wstring &value){
 		append((BYTE *)value.c_str(), value.length() * 2);
 		append((WORD)0);
 
@@ -237,7 +237,7 @@ public:
 		return *this;
 	}
 
-	ByteBuffer &operator>>(string &value){
+	ByteBuffer &operator>>(std::string &value){
 		value.clear();
 		for (;;)
 		{
@@ -249,7 +249,7 @@ public:
 		return *this;
 	}
 
-	ByteBuffer &operator>>(wstring &value){
+	ByteBuffer &operator>>(std::wstring &value){
 		value.clear();
 		for (;;){
 			wchar_t c = read<wchar_t>();
@@ -311,7 +311,7 @@ public:
 		return append((const BYTE *)src, cnt);
 	}
 
-	void append(const string &str){
+	void append(const std::string &str){
 		append((const BYTE *)str.c_str(), str.size() + 1);
 	}
 
@@ -357,17 +357,17 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 template <typename T>
-ByteBuffer &operator<<(ByteBuffer &b, vector<T> v)
+ByteBuffer &operator<<(ByteBuffer &b, std::vector<T> v)
 {
 	b << (DWORD)v.size();
-	for (vector<T>::iterator i = v.begin(); i != v.end(); i++) {
+	for (std::vector<T>::iterator i = v.begin(); i != v.end(); i++) {
 		b << *i;
 	}
 	return b;
 }
 
 template <typename T>
-ByteBuffer &operator>>(ByteBuffer &b, vector<T> &v){
+ByteBuffer &operator>>(ByteBuffer &b, std::vector<T> &v){
 	DWORD vsize;
 	b >> vsize;
 	v.clear();

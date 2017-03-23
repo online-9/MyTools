@@ -20,7 +20,7 @@ CLProcess::~CLProcess()
 
 }
 
-DWORD CLProcess::GetPid_For_ProcName(__in LPCWSTR pszText)
+DWORD CLProcess::GetPid_For_ProcName(_In_ LPCWSTR pszText)
 {
 	HANDLE hThSnap32 = NULL;
 	PROCESSENTRY32W pe32;
@@ -52,7 +52,7 @@ DWORD CLProcess::GetPid_For_ProcName(__in LPCWSTR pszText)
 }
 
 
-BOOL CLProcess::Is_Exist_Process_For_ProcId(__in DWORD dwPId)
+BOOL CLProcess::Is_Exist_Process_For_ProcId(_In_ DWORD dwPId)
 {
 	HANDLE hThSnap32 = NULL;
 	PROCESSENTRY32W pe32;
@@ -83,12 +83,12 @@ BOOL CLProcess::Is_Exist_Process_For_ProcId(__in DWORD dwPId)
 }
 
 
-BOOL CLProcess::Is_Exist_Process_For_ProcName(__in LPCWSTR pszText)
+BOOL CLProcess::Is_Exist_Process_For_ProcName(_In_ LPCWSTR pszText)
 {
 	return CLProcess::GetPid_For_ProcName(pszText) != NULL;
 }
 
-BOOL CLProcess::TerminateProc_For_ProcName(__in LPCWSTR pszText, __in OPTIONAL DWORD dwWaitTime /* = 3000 */, _In_ DWORD dwMaxTryCount /* = 10 */)
+BOOL CLProcess::TerminateProc_For_ProcName(_In_ LPCWSTR pszText, _In_ OPTIONAL DWORD dwWaitTime /* = 3000 */, _In_ DWORD dwMaxTryCount /* = 10 */)
 {
 	DWORD dwPid = GetPid_For_ProcName(pszText);
 
@@ -110,7 +110,7 @@ BOOL CLProcess::TerminateProc_For_ProcName(__in LPCWSTR pszText, __in OPTIONAL D
 	return NULL;
 }
 
-BOOL CLProcess::TerminateProc_For_ProcId(__in DWORD dwProcId, __in OPTIONAL DWORD dwWaitTime /* = 3000 */, _In_ DWORD dwMaxTryCount /* = 10 */)
+BOOL CLProcess::TerminateProc_For_ProcId(_In_ DWORD dwProcId, _In_ OPTIONAL DWORD dwWaitTime /* = 3000 */, _In_ DWORD dwMaxTryCount /* = 10 */)
 {
 	DWORD dwPid = dwProcId;
 	UINT uCount = 0;
@@ -130,7 +130,7 @@ BOOL CLProcess::TerminateProc_For_ProcId(__in DWORD dwProcId, __in OPTIONAL DWOR
 	return NULL;
 }
 
-BOOL CLProcess::GetProcessModule_For_Name(__in LPCWSTR pwchProcName, __in LPCWSTR pwchModuleName, __out MODULEENTRY32W& me32)
+BOOL CLProcess::GetProcessModule_For_Name(_In_ LPCWSTR pwchProcName, _In_ LPCWSTR pwchModuleName, _Out_ MODULEENTRY32W& me32)
 {
 	DWORD dwPid = GetPid_For_ProcName(pwchProcName);
 	HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPid);
@@ -157,7 +157,7 @@ BOOL CLProcess::GetProcessModule_For_Name(__in LPCWSTR pwchProcName, __in LPCWST
 	return FALSE;
 }
 
-CL_PROCESS_INFO* CLProcess::Query_Modules_For_PID(__in DWORD Pid)
+CL_PROCESS_INFO* CLProcess::Query_Modules_For_PID(_In_ DWORD Pid)
 {
 	HMODULE hMods[ARRAY_SIZE];
 	DWORD cbNeeded;
@@ -208,7 +208,7 @@ CL_PROCESS_INFO* CLProcess::Query_Modules_For_PID(__in DWORD Pid)
 	return &ProcessInfo;
 }
 
-DWORD CLProcess::Query_EnumProcesses(__out std::vector<CL_PROCESS_INFO> & vlst)
+DWORD CLProcess::Query_EnumProcesses(_Out_ std::vector<CL_PROCESS_INFO> & vlst)
 {
 	DWORD aProcesses[ARRAY_SIZE] = { 0 };	//ALL Pid
 	DWORD cbNeeded = 0;				//aProcesses Return Count
@@ -236,7 +236,7 @@ BOOL CLProcess::ClearWorkingMemory()
 	return EmptyWorkingSet(::GetCurrentProcess());
 }
 
-SIZE_T CLProcess::CalcWorkSetPrivate(__in HANDLE hProcess, __in OPTIONAL SIZE_T pageSize /* = 4096 */)
+SIZE_T CLProcess::CalcWorkSetPrivate(_In_ HANDLE hProcess, _In_ OPTIONAL SIZE_T pageSize /* = 4096 */)
 {
 	BOOL bRet = TRUE;
 	PSAPI_WORKING_SET_INFORMATION workSetInfo;
@@ -284,7 +284,7 @@ SIZE_T CLProcess::CalcWorkSetPrivate(__in HANDLE hProcess, __in OPTIONAL SIZE_T 
 	return workSetPrivate;
 }
 
-VOID CLProcess::RaisePrivilige(__in LPCWSTR pwszPrivilegeName)
+VOID CLProcess::RaisePrivilige(_In_ LPCWSTR pwszPrivilegeName)
 {
 	//提升权限，代码实例
 	HANDLE hToken;              // 令牌句柄
@@ -299,7 +299,7 @@ VOID CLProcess::RaisePrivilige(__in LPCWSTR pwszPrivilegeName)
 	CloseHandle(hToken);
 }
 
-BOOL CLProcess::SuspendProcess(__in DWORD dwPid, __in BOOL bSpspend /* = TRUE */)
+BOOL CLProcess::SuspendProcess(_In_ DWORD dwPid, _In_ BOOL bSpspend /* = TRUE */)
 {
 	HANDLE hSpanshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, dwPid);
 
@@ -330,7 +330,7 @@ BOOL CLProcess::SuspendProcess(__in DWORD dwPid, __in BOOL bSpspend /* = TRUE */
 	return TRUE;
 }
 
-BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
+BOOL CLProcess::LoadRemoteDLL(_In_ DWORD dwPid, _In_ LPCWSTR pwszDllPath)
 {
 	// RaisePrivilige
 	RaisePrivilige(SE_DEBUG_NAME);
@@ -397,7 +397,7 @@ BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
 	return TRUE;
 }
 
-BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWSTR pwszDLLPath, __out PROCESS_INFORMATION* pPROCESS_INFORMATION)
+BOOL CLProcess::CreateProcess_Injector_DLL(_In_ LPCWSTR pwszProcPath, _In_ LPCWSTR pwszDLLPath, _Out_ PROCESS_INFORMATION* pPROCESS_INFORMATION)
 {
 	typedef struct _SHELL_CODE
 	{
@@ -492,7 +492,7 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 	return TRUE;
 }
 
-UINT CLProcess::GetProcessSnapshot(__in std::vector<PROCESSENTRY32>& vlst)
+UINT CLProcess::GetProcessSnapshot(_In_ std::vector<PROCESSENTRY32>& vlst)
 {
 	HANDLE hThSnap32 = NULL;
 	PROCESSENTRY32W pe32;
@@ -516,7 +516,7 @@ UINT CLProcess::GetProcessSnapshot(__in std::vector<PROCESSENTRY32>& vlst)
 	return vlst.size();
 }
 
-BOOL CLProcess::CreateProcess_InjectorRemoteDLL(__in LPCWSTR pwszProcPath, __in LPCWSTR pwszDLLPath, __out PROCESS_INFORMATION* pPROCESS_INFORMATION /*= nullptr*/)
+BOOL CLProcess::CreateProcess_InjectorRemoteDLL(_In_ LPCWSTR pwszProcPath, _In_ LPCWSTR pwszDLLPath, _Out_ PROCESS_INFORMATION* pPROCESS_INFORMATION /*= nullptr*/)
 {
 	STARTUPINFOW		si = { sizeof(STARTUPINFOW) };
 	PROCESS_INFORMATION pi = { 0 };

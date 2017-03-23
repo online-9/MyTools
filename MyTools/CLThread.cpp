@@ -58,7 +58,7 @@ DWORD CLThread::SetThreadId(DWORD dwThreadId)
 	return NULL;
 }
 
-BOOL CLThread::QueryThreadInfo_By_Pid(__in DWORD dwPid, __out std::vector<CL_PROCESS_THREADINFO>& vlst)
+BOOL CLThread::QueryThreadInfo_By_Pid(_In_ DWORD dwPid, _Out_ std::vector<CL_PROCESS_THREADINFO>& vlst)
 {
 	/************************************************************************/
 	/* 
@@ -140,7 +140,7 @@ BOOL CLThread::QueryThreadInfo_By_Pid(__in DWORD dwPid, __out std::vector<CL_PRO
 
 	ZwQueryInformationThread pZwQueryInformationThread = NULL;
 
-	auto fnSetThreadInfo_By_Tid = [&pZwQueryInformationThread](__in DWORD dwTid, __out CL_PROCESS_THREADINFO& ThreadInfo)
+	auto fnSetThreadInfo_By_Tid = [&pZwQueryInformationThread](_In_ DWORD dwTid, _Out_ CL_PROCESS_THREADINFO& ThreadInfo)
 	{
 		THREAD_BASIC_INFORMATION    tbi = { 0 };
 		PVOID                       pvStartAddr = NULL;

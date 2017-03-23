@@ -30,7 +30,7 @@ BOOL CLFile::CreateMyDirectory(IN LPCWSTR pwchText, BOOL bShowErr /* = FALSE */)
 	return TRUE;
 }
 
-BOOL CLFile::ReadUnicodeFile(__in CONST std::wstring& wsPath, __out std::wstring& wsContent)
+BOOL CLFile::ReadUnicodeFile(_In_ CONST std::wstring& wsPath, _Out_ std::wstring& wsContent)
 {
 	FILE* pFile = nullptr;
 	_wfopen_s(&pFile, wsPath.c_str(), L"rb");
@@ -61,7 +61,7 @@ BOOL CLFile::ReadUnicodeFile(__in CONST std::wstring& wsPath, __out std::wstring
 	return TRUE;
 }
 
-BOOL CLFile::WriteUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::wstring& wsContent)
+BOOL CLFile::WriteUnicodeFile(_In_ CONST std::wstring& wsPath, _In_ CONST std::wstring& wsContent)
 {
 	// Exist Write File Mutex
 	static std::mutex MutexWriteUnicodeFile;
@@ -187,7 +187,7 @@ BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ CONST std::wstring& cwsPath, _In_ 
 }
 
 
-BOOL WINAPI CLFile::AppendUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::wstring& cwsContent)
+BOOL WINAPI CLFile::AppendUnicodeFile(_In_ CONST std::wstring& wsPath, _In_ CONST std::wstring& cwsContent)
 {
 	// Exist Write File Mutex
 	static std::mutex MutexAppendUnicodeFile;
