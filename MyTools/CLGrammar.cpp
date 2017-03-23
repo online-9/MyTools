@@ -19,7 +19,7 @@ CLGrammar::~CLGrammar()
 {
 }
 
-BOOL CLGrammar::AnalysisGrammar(__in LPCWSTR pwszText, __out LPWSTR pwszErrMsg)
+BOOL CLGrammar::AnalysisGrammar(_In_ LPCWSTR pwszText, _Out_ LPWSTR pwszErrMsg)
 {
 	/////AnalysisGrammar/////////////////////////////////////////////////////////////////////
 	if (wcslen(pwszText) >= 1024 / 2)
@@ -83,7 +83,7 @@ std::vector<GrammarTran>& CLGrammar::GetTranList()
 	return vlst;
 }
 
-VOID CLGrammar::AddTranList(__in LPCWSTR pwszCmd, __in GrammarFun lpfun)
+VOID CLGrammar::AddTranList(_In_ LPCWSTR pwszCmd, _In_ GrammarFun lpfun)
 {
 	std::vector<GrammarTran>& vlst = GetTranList();
 
@@ -101,7 +101,7 @@ VOID CLGrammar::AddTranList(__in LPCWSTR pwszCmd, __in GrammarFun lpfun)
 	vlst.push_back(GT);
 }
 
-LPVOID CLGrammar::GetFunAddr(__in LPCWSTR pwszCmd)
+LPVOID CLGrammar::GetFunAddr(_In_ LPCWSTR pwszCmd)
 {
 	std::vector<GrammarTran>& vlst = GetTranList();
 
@@ -115,7 +115,7 @@ std::vector<GrammarContext>& CLGrammar::GetGrammarList()
 	return vlst;
 }
 
-DWORD CLGrammar::Query_DWORDParm_By_GrammarList(__in UINT uIndex, __in std::vector<GrammarContext>& vlst)
+DWORD CLGrammar::Query_DWORDParm_By_GrammarList(_In_ UINT uIndex, _In_ std::vector<GrammarContext>& vlst)
 {
 	if (uIndex >= vlst.size())
 		return FALSE;
@@ -123,7 +123,7 @@ DWORD CLGrammar::Query_DWORDParm_By_GrammarList(__in UINT uIndex, __in std::vect
 	return wcstol(vlst.at(uIndex).szCmd, NULL, 16);
 }
 
-float CLGrammar::Query_FLOATParm_By_GrammarList(__in UINT uIndex, __in std::vector<GrammarContext>& vlst)
+float CLGrammar::Query_FLOATParm_By_GrammarList(_In_ UINT uIndex, _In_ std::vector<GrammarContext>& vlst)
 {
 	if (uIndex >= vlst.size())
 		return FALSE;
@@ -131,7 +131,7 @@ float CLGrammar::Query_FLOATParm_By_GrammarList(__in UINT uIndex, __in std::vect
 	return (float)_wtof(vlst.at(uIndex).szCmd);
 }
 
-LPCWSTR CLGrammar::Query_LPWSTRParm_By_GrammarList(__in UINT uIndex, __in std::vector<GrammarContext>& vlst)
+LPCWSTR CLGrammar::Query_LPWSTRParm_By_GrammarList(_In_ UINT uIndex, _In_ std::vector<GrammarContext>& vlst)
 {
 	if (uIndex >= vlst.size())
 		return nullptr;
@@ -139,7 +139,7 @@ LPCWSTR CLGrammar::Query_LPWSTRParm_By_GrammarList(__in UINT uIndex, __in std::v
 	return vlst.at(uIndex).szCmd;
 }
 
-BOOL CLGrammar::Check_ParmCount_By_GrammarList(__in UINT uCount, __in std::vector<GrammarContext>& vlst)
+BOOL CLGrammar::Check_ParmCount_By_GrammarList(_In_ UINT uCount, _In_ std::vector<GrammarContext>& vlst)
 {
 	return vlst.size() - 1 >= uCount;
 }

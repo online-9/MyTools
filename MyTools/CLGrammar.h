@@ -28,15 +28,15 @@ public:
 	CLGrammar();
 	~CLGrammar();
 
-	static BOOL						AnalysisGrammar(__in LPCWSTR pwszText, __out LPWSTR pwszErrMsg);
+	static BOOL						AnalysisGrammar(_In_ LPCWSTR pwszText, _Out_ LPWSTR pwszErrMsg);
 	static std::vector<GrammarContext>&	GetGrammarList();
 	static std::vector<GrammarTran>&		GetTranList();
-	static VOID						AddTranList(__in LPCWSTR pwszCmd, __in GrammarFun lpfun);
-	static LPVOID					GetFunAddr(__in LPCWSTR pwszCmd);
-	static DWORD					Query_DWORDParm_By_GrammarList(__in UINT uIndex, __in std::vector<GrammarContext>& vlst);
-	static float					Query_FLOATParm_By_GrammarList(__in UINT uIndex, __in std::vector<GrammarContext>& vlst);
-	static LPCWSTR					Query_LPWSTRParm_By_GrammarList(__in UINT uIndex, __in std::vector<GrammarContext>& vlst);
-	static BOOL						Check_ParmCount_By_GrammarList(__in UINT uCount, __in std::vector<GrammarContext>& vlst);
+	static VOID						AddTranList(_In_ LPCWSTR pwszCmd, _In_ GrammarFun lpfun);
+	static LPVOID					GetFunAddr(_In_ LPCWSTR pwszCmd);
+	static DWORD					Query_DWORDParm_By_GrammarList(_In_ UINT uIndex, _In_ std::vector<GrammarContext>& vlst);
+	static float					Query_FLOATParm_By_GrammarList(_In_ UINT uIndex, _In_ std::vector<GrammarContext>& vlst);
+	static LPCWSTR					Query_LPWSTRParm_By_GrammarList(_In_ UINT uIndex, _In_ std::vector<GrammarContext>& vlst);
+	static BOOL						Check_ParmCount_By_GrammarList(_In_ UINT uCount, _In_ std::vector<GrammarContext>& vlst);
 };
 
 
