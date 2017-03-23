@@ -168,7 +168,7 @@ BOOL WINAPI CLFile::ReadAsciiFileLen(_In_ CONST std::wstring& cwsPath, _Out_ ULO
 	return TRUE;
 }
 
-BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ cwstring& cwsPath, _In_ LONG ulFileLen, _Out_ std::shared_ptr<CHAR>& psContent)
+BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ CONST std::wstring& cwsPath, _In_ LONG ulFileLen, _Out_ std::shared_ptr<CHAR>& psContent)
 {
 	FILE* pFile = nullptr;
 	fopen_s(&pFile, CCharacter::UnicodeToASCII(cwsPath).c_str(), "rb");
@@ -187,7 +187,7 @@ BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ cwstring& cwsPath, _In_ LONG ulFil
 }
 
 
-BOOL WINAPI CLFile::AppendUnicodeFile(__in cwstring& wsPath, __in cwstring& cwsContent)
+BOOL WINAPI CLFile::AppendUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::wstring& cwsContent)
 {
 	// Exist Write File Mutex
 	static std::mutex MutexAppendUnicodeFile;

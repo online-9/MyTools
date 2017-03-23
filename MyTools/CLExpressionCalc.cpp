@@ -66,7 +66,7 @@ BOOL CLExpressionCalc::Analysis(_In_ CONST std::wstring& wsText) throw()
 	return FALSE;
 }
 
-BOOL CLExpressionCalc::IsConformToCmdType(_In_ cwstring& wsText) CONST throw()
+BOOL CLExpressionCalc::IsConformToCmdType(_In_ CONST std::wstring& wsText) CONST throw()
 {
 	vector<std::wstring> VecParm;
 	CCharacter::Split(wsText, L" ", VecParm, Split_Option_KeepOnly | Split_Option_RemoveEmptyEntries);
@@ -74,7 +74,7 @@ BOOL CLExpressionCalc::IsConformToCmdType(_In_ cwstring& wsText) CONST throw()
 	return GetCmdType(VecParm.at(0)) != em_Cmd_Type::em_Cmd_Type_Invalid;
 }
 
-CLExpressionCalc::em_Cmd_Type CLExpressionCalc::GetCmdType(_In_ cwstring& wsText) CONST throw()
+CLExpressionCalc::em_Cmd_Type CLExpressionCalc::GetCmdType(_In_ CONST std::wstring& wsText) CONST throw()
 {
 	auto wsLowerText = CCharacter::MakeTextToLower(wsText);
 	if (wsLowerText == L"dd")
@@ -123,7 +123,7 @@ CLExpressionCalc::em_Text_Type CLExpressionCalc::GetTextType(_In_ CONST UINT& uI
 	return em_Text_Type::em_Text_Type_Invalid;
 }
 
-CLExpressionCalc::em_Content_Type CLExpressionCalc::GetContentType(_In_ cwstring& wsSymbolText, _In_ em_Text_Type emTextType) throw()
+CLExpressionCalc::em_Content_Type CLExpressionCalc::GetContentType(_In_ CONST std::wstring& wsSymbolText, _In_ em_Text_Type emTextType) throw()
 {
 	struct TextContent
 	{
@@ -479,7 +479,7 @@ BOOL CLExpressionCalc::ReadMem_By_Rpn() throw()
 	return TRUE;
 }
 
-BOOL CLExpressionCalc::IsNumber(_In_ cwstring& wsText) CONST throw()
+BOOL CLExpressionCalc::IsNumber(_In_ CONST std::wstring& wsText) CONST throw()
 {
 	for (CONST auto& itm : wsText)
 	{
