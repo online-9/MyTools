@@ -9,7 +9,7 @@
 
 BOOL CLExpressionCalc::Analysis(_In_ CONST std::wstring& wsText) throw()
 {
-	vector<std::wstring> VecParm;
+	std::vector<std::wstring> VecParm;
 	CCharacter::Split(wsText, L" ", VecParm, Split_Option_KeepOnly | Split_Option_RemoveEmptyEntries);
 
 	ExpContent.emCmdType = GetCmdType(VecParm.at(0));
@@ -68,7 +68,7 @@ BOOL CLExpressionCalc::Analysis(_In_ CONST std::wstring& wsText) throw()
 
 BOOL CLExpressionCalc::IsConformToCmdType(_In_ CONST std::wstring& wsText) CONST throw()
 {
-	vector<std::wstring> VecParm;
+	std::vector<std::wstring> VecParm;
 	CCharacter::Split(wsText, L" ", VecParm, Split_Option_KeepOnly | Split_Option_RemoveEmptyEntries);
 
 	return GetCmdType(VecParm.at(0)) != em_Cmd_Type::em_Cmd_Type_Invalid;

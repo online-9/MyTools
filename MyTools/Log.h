@@ -107,8 +107,8 @@ private:
 
 	BOOL GetSaveLogContentForQueue(_Out_ LogContent& LogContent_);
 private:
-	queue<LogContent> QueueLogContent;
-	queue<LogContent> QueueSaveLogContent;
+	std::queue<LogContent> QueueLogContent;
+	std::queue<LogContent> QueueSaveLogContent;
 
 	SYSTEMTIME CurrentSysTime;
 	std::wstring wsLogFilePath;

@@ -115,7 +115,7 @@ public:
 	}
 
 	template<class T>
-	static int GetRecentlyIndexByVec(_In_ CONST vector<T>& Vec, _In_ CONST T& TarPoint, _In_ float MinDis = FLT_MAX)
+	static int GetRecentlyIndexByVec(_In_ CONST std::vector<T>& Vec, _In_ CONST T& TarPoint, _In_ float MinDis = FLT_MAX)
 	{
 		auto Index = -1;
 		auto VecMinDis = FLT_MAX;
@@ -134,7 +134,7 @@ public:
 	}
 
 	template<class T,class T2>
-	static int GetRecentlyIndexByPointVec(_In_ CONST vector<T>& Vec, _In_ CONST T2& TarPoint, _In_ float MinDis = FLT_MAX)
+	static int GetRecentlyIndexByPointVec(_In_ CONST std::vector<T>& Vec, _In_ CONST T2& TarPoint, _In_ float MinDis = FLT_MAX)
 	{
 		auto Index = -1;
 		auto VecMinDis = FLT_MAX;
