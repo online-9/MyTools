@@ -274,6 +274,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnIfPtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
+			Log(LOG_LEVEL_NORMAL, L"执行if的结果=true,调用%s", static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName.c_str());
 			AddExcuteQueue(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, NULL);
 			return TRUE;
 		}
@@ -287,6 +288,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
+			Log(LOG_LEVEL_NORMAL, L"执行while的结果=true,调用%s", static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName.c_str());
 			ExcuteLoop(wsMethodName, ScriptCode_);
 			return TRUE;
 		}
