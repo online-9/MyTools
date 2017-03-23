@@ -3,7 +3,7 @@
 #include <Shlwapi.h>
 #include "psapi.h"
 #include "Character.h"
-#include "CLLog.h"
+#include "Log.h"
 #include "CLPublic.h"
 #include <algorithm>
 
@@ -340,7 +340,7 @@ BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
 	HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPid);
 	if (hProcess == NULL)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"OpenProcess Faild!");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"OpenProcess Faild!");
 		return FALSE;
 	}
 
@@ -350,7 +350,7 @@ BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
 	LPVOID pAllocMem = VirtualAllocEx(hProcess, NULL, dwDLLSize, MEM_COMMIT, PAGE_READWRITE);
 	if (pAllocMem == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"VirtualAllocEx in Target Process Faild!");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"VirtualAllocEx in Target Process Faild!");
 		return FALSE;
 	}
 
@@ -358,7 +358,7 @@ BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
 	BOOL bRetCode = WriteProcessMemory(hProcess, (PVOID)pAllocMem, (PVOID)pwszDllPath, dwDLLSize, NULL);
 	if (!bRetCode)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"WriteProcessMemory Faild!");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"WriteProcessMemory Faild!");
 		return FALSE;
 	}
 
@@ -366,21 +366,21 @@ BOOL CLProcess::LoadRemoteDLL(__in DWORD dwPid, __in LPCWSTR pwszDllPath)
 	HMODULE hmKernel32 = ::GetModuleHandle(TEXT("Kernel32"));
 	if (hmKernel32 == NULL)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"GetModuleHandle 'Kernel32' Faild!");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"GetModuleHandle 'Kernel32' Faild!");
 		return FALSE;
 	}
 
 	PTHREAD_START_ROUTINE pfnThreadRrn = (PTHREAD_START_ROUTINE)GetProcAddress(hmKernel32, "LoadLibraryW");
 	if (pfnThreadRrn == NULL)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"pfnThreadRrn = NULL");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"pfnThreadRrn = NULL");
 		return FALSE;
 	}
 
 	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, pfnThreadRrn, (PVOID)pAllocMem, 0, NULL);
 	if (hThread == NULL)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"hThread = NULL");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"hThread = NULL");
 		return FALSE;
 	}
 
@@ -434,7 +434,7 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 	//PrintDebug_W(CLPublic::FileExit(pwszProcPath), _SELF, __LINE__, L"UnExist Process Path:%s", pwszProcPath);
 	if (!CLPublic::FileExit(pwszDLLPath))
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"UnExist Injector DLL Path:%s", pwszDLLPath);
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"UnExist Injector DLL Path:%s", pwszDLLPath);
 		return FALSE;
 	}
 
@@ -447,14 +447,14 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 
 	if (!PathRemoveFileSpecW(wszProcDirectory))
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"Can't Get Process Work Directory in Process Path");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"Can't Get Process Work Directory in Process Path");
 		return FALSE;
 	}
 
 
 	if (!::CreateProcessW(NULL, wszProcPath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
 		return FALSE;
 	}
 
@@ -464,7 +464,7 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 	Buffer = ::VirtualAllocEx(pi.hProcess, NULL, sizeof(SHELL_CODE), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	if (Buffer == NULL)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"VirtualAllocEx = NULL");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"VirtualAllocEx = NULL");
 		return FALSE;
 	}
 
@@ -478,7 +478,7 @@ BOOL CLProcess::CreateProcess_Injector_DLL(__in LPCWSTR pwszProcPath, __in LPCWS
 
 	if (!WriteProcessMemory(pi.hProcess, Buffer, &ShellCode, sizeof(SHELL_CODE), &NumberOfBytesWritten))
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"WriteProcessMemory ShellCode Fiald!");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"WriteProcessMemory ShellCode Fiald!");
 		return FALSE;
 	}
 
@@ -529,7 +529,7 @@ BOOL CLProcess::CreateProcess_InjectorRemoteDLL(__in LPCWSTR pwszProcPath, __in 
 	CCharacter::wstrcpy_my(wszProcPath, pwszProcPath, _countof(wszProcPath) - 1);
 	if (!::CreateProcessW(NULL, wszProcPath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"CreateProcess Fiald! ErrorCode=%X", ::GetLastError());
 		return FALSE;
 	}
 

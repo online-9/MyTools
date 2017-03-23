@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CLFile.h"
 #include <mutex>
-#include "CLLog.h"
+#include "Log.h"
 #include "Character.h"
 #include "CLPublic.h"
 #pragma comment(lib, "version.lib")
@@ -36,7 +36,7 @@ BOOL CLFile::ReadUnicodeFile(__in CONST std::wstring& wsPath, __out std::wstring
 	_wfopen_s(&pFile, wsPath.c_str(), L"rb");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
 		return FALSE;
 	}
 
@@ -47,7 +47,7 @@ BOOL CLFile::ReadUnicodeFile(__in CONST std::wstring& wsPath, __out std::wstring
 	std::shared_ptr<WCHAR> pwstrBuffer(new WCHAR[lLen], [](WCHAR* p){delete[] p; });
 	if (pwstrBuffer == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"Alloc Memory Fiald!");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"Alloc Memory Fiald!");
 		return FALSE;
 	}
 
@@ -73,7 +73,7 @@ BOOL CLFile::WriteUnicodeFile(__in CONST std::wstring& wsPath, __in CONST std::w
 	_wfopen_s(&pFile, wsPath.c_str(), L"wb+");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
 		return FALSE;
 	}
 
@@ -101,7 +101,7 @@ BOOL WINAPI CLFile::WriteASCIIFile(_In_ CONST std::wstring& wsPath, _In_ CONST s
 	_wfopen_s(&pFile, wsPath.c_str(), L"a+");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"ReadScriptFile Fiald! Path:%s", wsPath.c_str());
 		return FALSE;
 	}
 
@@ -120,7 +120,7 @@ BOOL WINAPI CLFile::WriteFile(_In_ CONST std::wstring& cwsPath, _In_ CONST BYTE*
 	_wfopen_s(&pFile, cwsPath.c_str(), L"wb+");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"WriteFile Fiald! Path:%s", cwsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"WriteFile Fiald! Path:%s", cwsPath.c_str());
 		return FALSE;
 	}
 
@@ -138,7 +138,7 @@ BOOL WINAPI CLFile::AppendFile(_In_ CONST std::wstring& cwsPath, _In_ CONST BYTE
 	_wfopen_s(&pFile, cwsPath.c_str(), L"ab+");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"AppendFile Fiald! Path:%s", cwsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"AppendFile Fiald! Path:%s", cwsPath.c_str());
 		return FALSE;
 	}
 
@@ -156,7 +156,7 @@ BOOL WINAPI CLFile::ReadAsciiFileLen(_In_ CONST std::wstring& cwsPath, _Out_ ULO
 	_wfopen_s(&pFile, cwsPath.c_str(), L"rb");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", cwsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"ReadScriptFile Fiald! Path:%s", cwsPath.c_str());
 		return FALSE;
 	}
 
@@ -174,7 +174,7 @@ BOOL WINAPI CLFile::ReadAsciiFileContent(_In_ cwstring& cwsPath, _In_ LONG ulFil
 	fopen_s(&pFile, CCharacter::UnicodeToASCII(cwsPath).c_str(), "rb");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"ReadScriptFile Fiald! Path:%s", cwsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"ReadScriptFile Fiald! Path:%s", cwsPath.c_str());
 		return FALSE;
 	}
 
@@ -200,7 +200,7 @@ BOOL WINAPI CLFile::AppendUnicodeFile(__in cwstring& wsPath, __in cwstring& cwsC
 	_wfopen_s(&pFile, wsPath.c_str(), L"ab+");
 	if (pFile == nullptr)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"AppendUnicodeFile Fiald! Path:%s", wsPath.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"AppendUnicodeFile Fiald! Path:%s", wsPath.c_str());
 		return FALSE;
 	}
 
@@ -217,12 +217,12 @@ BOOL WINAPI CLFile::AppendUnicodeFile(__in cwstring& wsPath, __in cwstring& cwsC
 
 BOOL WINAPI CLFile::CreateUnicodeTextFile(_In_ CONST std::wstring& cwsPath)
 {
-	Log(LOG_LEVEL_NORMAL, L"CreateUnicodeTextFile:%s", cwsPath.c_str());
+	LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"CreateUnicodeTextFile:%s", cwsPath.c_str());
 	FILE* pFile = nullptr;
 	_wfopen_s(&pFile, cwsPath.c_str(), L"a");
 	if (pFile == NULL)
 	{
-		LogMsgBox(LOG_LEVEL_EXCEPTION, L"创建文件:%s 失败!", cwsPath.c_str());
+		LOG_MSG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"创建文件:%s 失败!", cwsPath.c_str());
 		return FALSE;
 	}
 
@@ -239,7 +239,7 @@ BOOL WINAPI CLFile::CreateASCIITextFile(_In_ CONST std::wstring& cwsPath)
 	_wfopen_s(&pFile, cwsPath.c_str(), L"a");
 	if (pFile == NULL)
 	{
-		LogMsgBox(LOG_LEVEL_EXCEPTION, L"创建文件:%s 失败!", cwsPath.c_str());
+		LOG_MSG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"创建文件:%s 失败!", cwsPath.c_str());
 		return FALSE;
 	}
 

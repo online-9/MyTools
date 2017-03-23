@@ -3,7 +3,7 @@
 #include <tlhelp32.h>
 #include <process.h>
 #include <psapi.h>
-#include "CLLog.h"
+#include "Log.h"
 #pragma comment (lib, "psapi.lib")
 
 #define _SELF L"CLThread.cpp"
@@ -53,7 +53,7 @@ DWORD CLThread::SetThreadId(DWORD dwThreadId)
 	}
 	_except(EXCEPTION_EXECUTE_HANDLER)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"SetThreadId出现异常");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"SetThreadId出现异常");
 	}
 	return NULL;
 }
@@ -213,7 +213,7 @@ BOOL CLThread::QueryThreadInfo_By_Pid(__in DWORD dwPid, __out std::vector<CL_PRO
 	}
 	catch (...)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"QueryThreadInfo_By_Pid出现异常");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"QueryThreadInfo_By_Pid出现异常");
 	}
 	return FALSE;
 }

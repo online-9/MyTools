@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CLHook.h"
 #include <algorithm>
-#include "CLLog.h"
+#include "Log.h"
 #include "Character.h"
 #include "CLPublic.h"
 #define _SELF L"CLHook.cpp"
@@ -64,7 +64,7 @@ BOOL CLHook::Hook_Fun_Jmp_MyAddr(MYHOOK_CONTENT* pHookContent)
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-		Log(LOG_LEVEL_EXCEPTION,L"Hook_Fun_Jmp_MyAddr出现异常");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception,L"Hook_Fun_Jmp_MyAddr出现异常");
 	}
 
 	return FALSE;
@@ -89,7 +89,7 @@ BOOL CLHook::UnHook_Fun_Jmp_MyAddr(const MYHOOK_CONTENT* pHookContent)
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-		Log(LOG_LEVEL_EXCEPTION,L"UnHook_Fun_Jmp_MyAddr发生了异常");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception,L"UnHook_Fun_Jmp_MyAddr发生了异常");
 	}
 	return FALSE;
 }

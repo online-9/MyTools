@@ -2,7 +2,7 @@
 #include "Script.h"
 #include "CLFile.h"
 #include "CLPublic.h"
-#include "CLLog.h"
+#include "Log.h"
 
 #define _SELF L"Script.cpp"
 MyTools::CScript::CScript()
@@ -266,7 +266,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 	switch (ScriptCode_.pCode->emScriptCodeType)
 	{
 	case em_Script_CodeType_If:
-		Log(LOG_LEVEL_NORMAL, L"执行if语句:'%s'", ScriptCode_.wsSourceText.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"执行if语句:'%s'", ScriptCode_.wsSourceText.c_str());
 		if (_fnIfPtr == nullptr)
 		{
 			PrintLog(__LINE__, L"Not Declare Method if Ptr!!!");
@@ -274,13 +274,13 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnIfPtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
-			Log(LOG_LEVEL_NORMAL, L"执行if的结果=true,调用%s", static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName.c_str());
+			LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"执行if的结果=true,调用%s", static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName.c_str());
 			AddExcuteQueue(static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName, NULL);
 			return TRUE;
 		}
 		break;
 	case em_Script_CodeType_While:
-		Log(LOG_LEVEL_NORMAL, L"执行while循环:'%s'", ScriptCode_.wsSourceText.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"执行while循环:'%s'", ScriptCode_.wsSourceText.c_str());
 		if (_fnWhilePtr == nullptr)
 		{
 			PrintLog(__LINE__, L"Not Declare Method While Ptr!!!");
@@ -288,13 +288,13 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		else if (_fnWhilePtr(*static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)))
 		{
-			Log(LOG_LEVEL_NORMAL, L"执行while的结果=true,调用%s", static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName.c_str());
+			LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"执行while的结果=true,调用%s", static_cast<CONST Script_Code_If*>(ScriptCode_.pCode)->wsMethodName.c_str());
 			ExcuteLoop(wsMethodName, ScriptCode_);
 			return TRUE;
 		}
 		break;
 	case em_Script_CodeType_Method:
-		Log(LOG_LEVEL_NORMAL, L"执行函数:'%s'", ScriptCode_.wsSourceText.c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"执行函数:'%s'", ScriptCode_.wsSourceText.c_str());
 		if (ExistDefMethod(static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode)->wsMethodName) != nullptr)
 		{
 			AddExcuteQueue(static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode)->wsMethodName, NULL);
@@ -347,7 +347,7 @@ BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Scr
 			_pCurrentMethodContent = pCodeMethod;
 			return p->MethodPtr();
 		}
-		__except (CLLog::PrintExceptionCode(GetExceptionInformation()))
+		__except (1)
 		{
 			PrintLog(__LINE__, L"fnExcuteCustomeFun发生了异常");
 		}

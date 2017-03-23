@@ -93,12 +93,6 @@
     <ClCompile Include="DES.cpp">
       <Filter>Algorithm</Filter>
     </ClCompile>
-    <ClCompile Include="CLStackTrace.cpp">
-      <Filter>Debug\TrackStack</Filter>
-    </ClCompile>
-    <ClCompile Include="CLLog.cpp">
-      <Filter>Debug\Log</Filter>
-    </ClCompile>
     <ClCompile Include="CLLock.cpp">
       <Filter>Thread\Lock</Filter>
     </ClCompile>
@@ -128,9 +122,6 @@
     </ClCompile>
     <ClCompile Include="CLPic.cpp">
       <Filter>Pic</Filter>
-    </ClCompile>
-    <ClCompile Include="CLScript.cpp">
-      <Filter>Character\Script</Filter>
     </ClCompile>
     <ClCompile Include="CLFile.cpp">
       <Filter>File</Filter>
@@ -179,12 +170,6 @@
     <ClInclude Include="RC4.hpp">
       <Filter>Algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="CLStackTrace.h">
-      <Filter>Debug\TrackStack</Filter>
-    </ClInclude>
-    <ClInclude Include="CLLog.h">
-      <Filter>Debug\Log</Filter>
-    </ClInclude>
     <ClInclude Include="ByteBuffer.h">
       <Filter>Socket</Filter>
     </ClInclude>
@@ -223,9 +208,6 @@
     </ClInclude>
     <ClInclude Include="CLResManager.h">
       <Filter>Res</Filter>
-    </ClInclude>
-    <ClInclude Include="CLScript.h">
-      <Filter>Character\Script</Filter>
     </ClInclude>
     <ClInclude Include="CLFile.h">
       <Filter>File</Filter>

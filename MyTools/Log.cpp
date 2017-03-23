@@ -4,7 +4,6 @@
 #include <thread>
 #include "CLThread.h"
 #include "Character.h"
-#include "CLStackTrace.h"
 #include "CLPublic.h"
 #include "CLFile.h"
 #include "CLExpressionCalc.h"
@@ -44,17 +43,8 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 	CCharacter::wstrcpy_my(LogContent_.wszFunName, pwszFunName, _countof(LogContent_.wszFunName) - 1);
 	CCharacter::wstrcpy_my(LogContent_.wszLogContent, szBuff, _countof(LogContent_.wszLogContent));
 
-	std::stack<CLStackGroup::FunctionStackContent> vStackTracer;
-	CLStackGroup::GetInstance().CopyThreadStackContent(::GetCurrentThreadId(), vStackTracer);
-
 	LogContent_.uRepeatCount = 0;
-	LogContent_.uStackCount = vStackTracer.size() >= 10 ? 10 : vStackTracer.size();
-	for (INT i = 0; !vStackTracer.empty() && i < 10; ++i)
-	{
-		auto& itm = vStackTracer.top();
-		CCharacter::wstrcpy_my(LogContent_.wszStack[i], itm.wsFunName.c_str(), _countof(LogContent_.wszStack[i]) - 1);
-		vStackTracer.pop();
-	}
+	LogContent_.uStackCount = 0;
 
 	if (nLogOutputType & LOG_TYPE_FILE)
 	{

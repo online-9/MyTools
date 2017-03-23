@@ -2,7 +2,7 @@
 #include "CLNoModuleDLL.h"
 #include "CLNoModuleDLL_Struct.h"
 #include "Character.h"
-#include "CLLog.h"
+#include "Log.h"
 
 #define _SELF L"CLNoModuleDLL.cpp"
 
@@ -21,7 +21,7 @@ BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFil
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL, NULL);
 	if (INVALID_HANDLE_VALUE == hFile) {
-		Log(LOG_LEVEL_EXCEPTION, L"hFile = NULL, strFileName = %s",  CCharacter::ASCIIToUnicode(strFileName).c_str());
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"hFile = NULL, strFileName = %s",  CCharacter::ASCIIToUnicode(strFileName).c_str());
 		return FALSE;
 	}
 
@@ -31,7 +31,7 @@ BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFil
 
 	if (nFileSize == 0)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"nFileSize = 0");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"nFileSize = 0");
 		return FALSE;
 	}
 	else
@@ -41,7 +41,7 @@ BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFil
 	DWORD dwReadSize = 0;
 	if (!ReadFile(hFile, pFileBuff, nFileSize, &dwReadSize, NULL))
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"ReadFile = 0");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"ReadFile = 0");
 		return FALSE;
 	}
 
@@ -51,7 +51,7 @@ BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFil
 	PIMAGE_DOS_HEADER pIDH = (PIMAGE_DOS_HEADER)pFileBuff;
 	if (IMAGE_DOS_SIGNATURE != pIDH->e_magic)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"!= MZ");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"!= MZ");
 		return FALSE;
 	}
 
@@ -59,7 +59,7 @@ BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFil
 
 	if (IMAGE_NT_SIGNATURE != pINH->Signature)
 	{
-		Log(LOG_LEVEL_EXCEPTION, L"!= PE");
+		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"!= PE");
 		return FALSE;
 	}
 

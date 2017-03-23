@@ -2,7 +2,6 @@
 #include "CLGrammar.h"
 #include <algorithm>
 #include <iostream>
-#include "CLLog.h"
 #include "Character.h"
 #define _SELF L"CLGrammar.cpp"
 

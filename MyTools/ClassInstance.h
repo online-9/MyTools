@@ -2,7 +2,6 @@
 #define __MYTOOLS_PUBLIC_CLASSINSTANCE_H__
 
 #include <map>
-#include "CLLog.h"
 #include "CLLock.h"
 
 template<class T = DWORD>

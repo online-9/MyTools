@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "CLLock.h"
-#include "CLLog.h"
+#include "Log.h"
 #include <exception>
 #include "Character.h"
-#include "CLStackTrace.h"
 #define _SELF L"CLLock.cpp"
 
 CLLock::CLLock(_In_ std::wstring wsLockName_) : wsLockName(wsLockName_)
@@ -24,7 +23,7 @@ void CLLock::Lock() CONST
 {
 	//if (WaitForSingleObject(hMutex, 15 * 1000) == WAIT_TIMEOUT)
 	//{
-	//	Log(LOG_LEVEL_EXCEPTION, L"Lock超时, LockName=%s", wsLockName.c_str());
+	//	LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"Lock超时, LockName=%s", wsLockName.c_str());
 	//}
 	::EnterCriticalSection(&LockSection);
 }
@@ -46,9 +45,9 @@ BOOL CLLock::Access(std::function<void(void)> MethodPtr) CONST
 		{
 			MethodPtr();
 		}
-		__except (CLLog::PrintExceptionCode(GetExceptionInformation()))
+		__except (1)
 		{
-			Log(LOG_LEVEL_EXCEPTION, L"Access发生了异常, LockName=%s", wsLockName.c_str());
+			LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"Access发生了异常, LockName=%s", wsLockName.c_str());
 		}
 	};
 
