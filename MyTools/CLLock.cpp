@@ -8,40 +8,43 @@
 
 CLLock::CLLock(_In_ std::wstring wsLockName_) : wsLockName(wsLockName_)
 {
-	hMutex = ::CreateMutexW(NULL, FALSE, wsLockName_.c_str());
-	//InitializeCriticalSection(&cs);
+	//hMutex = ::CreateMutexW(NULL, FALSE, wsLockName_.c_str());
+	::InitializeCriticalSection(&LockSection);
 }
 
 CLLock::~CLLock()
 {
-	::ReleaseMutex(hMutex);
-	::CloseHandle(hMutex);
-	hMutex = NULL;
+	//::ReleaseMutex(hMutex);
+	//::CloseHandle(hMutex);
+	//hMutex = NULL;
+	::DeleteCriticalSection(&LockSection);
 }
 
 void CLLock::Lock() CONST
 {
-	if (WaitForSingleObject(hMutex, 15 * 1000) == WAIT_TIMEOUT)
-	{
-		Log(LOG_LEVEL_EXCEPTION, L"Lock³¬Ê±, LockName=%s", wsLockName.c_str());
-	}
+	//if (WaitForSingleObject(hMutex, 15 * 1000) == WAIT_TIMEOUT)
+	//{
+	//	Log(LOG_LEVEL_EXCEPTION, L"Lock³¬Ê±, LockName=%s", wsLockName.c_str());
+	//}
+	::EnterCriticalSection(&LockSection);
 }
 
 void CLLock::UnLock() CONST
 {
-	::ReleaseMutex(hMutex);
+	//::ReleaseMutex(hMutex);
+	::LeaveCriticalSection(&LockSection);
 }
 
-BOOL CLLock::Access(std::function<void(void)> f) CONST
+BOOL CLLock::Access(std::function<void(void)> MethodPtr) CONST
 {
 	BOOL bRetCode = FALSE;
 	Lock();
 
-	auto fnAccess = [&f,this]
+	auto fnAccess = [&MethodPtr,this]
 	{
 		__try
 		{
-			f();
+			MethodPtr();
 		}
 		__except (CLLog::PrintExceptionCode(GetExceptionInformation()))
 		{
