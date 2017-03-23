@@ -91,6 +91,7 @@ namespace MyTools
 
 		struct Script_Code
 		{
+			std::wstring		wsSourceText;
 			Script_Code_Type*	pCode;
 			ULONG				ulCodeHash;
 			Script_Code()

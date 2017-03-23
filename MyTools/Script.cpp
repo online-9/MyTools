@@ -63,13 +63,12 @@ BOOL MyTools::CScript::Excute(_In_ CONST std::wstring& wsMethodName)
 	AddExcuteQueue(wsMethodName);
 	while (!_QueCurrentPos.empty())
 	{
-		auto CurrentPos = _QueCurrentPos.top();
+		auto CurrentPos = std::move(_QueCurrentPos.top());
 		RemoveQueue();
 
 		if (!ExcuteDefMethod(CurrentPos.wsDefMethodName, CurrentPos.ulCodeHash))
 			return FALSE;
 
-		
 	}
 	return TRUE;
 }
@@ -267,6 +266,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 	switch (ScriptCode_.pCode->emScriptCodeType)
 	{
 	case em_Script_CodeType_If:
+		Log(LOG_LEVEL_NORMAL, L"执行if语句:'%s'", ScriptCode_.wsSourceText.c_str());
 		if (_fnIfPtr == nullptr)
 		{
 			PrintLog(__LINE__, L"Not Declare Method if Ptr!!!");
@@ -279,6 +279,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		break;
 	case em_Script_CodeType_While:
+		Log(LOG_LEVEL_NORMAL, L"执行while循环:'%s'", ScriptCode_.wsSourceText.c_str());
 		if (_fnWhilePtr == nullptr)
 		{
 			PrintLog(__LINE__, L"Not Declare Method While Ptr!!!");
@@ -291,6 +292,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 		}
 		break;
 	case em_Script_CodeType_Method:
+		Log(LOG_LEVEL_NORMAL, L"执行函数:'%s'", ScriptCode_.wsSourceText.c_str());
 		if (ExistDefMethod(static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode)->wsMethodName) != nullptr)
 		{
 			AddExcuteQueue(static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode)->wsMethodName, NULL);
@@ -340,7 +342,6 @@ BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Scr
 	{
 		__try
 		{
-			Log(LOG_LEVEL_NORMAL, L"执行函数:%s", p->wsMethodName.c_str());
 			_pCurrentMethodContent = pCodeMethod;
 			return p->MethodPtr();
 		}
@@ -421,6 +422,7 @@ BOOL MyTools::CScript::AnalysisCode_Brace(_In_ em_Script_CodeType emScriptCodeTy
 	}
 
 	Script_Code ScriptCode;
+	ScriptCode.wsSourceText = emScriptCodeType_ == em_Script_CodeType::em_Script_CodeType_LeftBrace ? L"{" : L"}";
 	ScriptCode.pCode = pCode;
 	DefMethodContent_.VecScriptCode.push_back(std::move(ScriptCode));
 	return TRUE;
@@ -503,6 +505,7 @@ BOOL MyTools::CScript::AnalysisCode_If(_In_ em_Script_CodeType emScriptCodeType_
 	pScriptCodeIf->wsMethodName = std::move(CCharacter::Trim_W(Text));
 	
 	Script_Code ScriptCode;
+	ScriptCode.wsSourceText = emScriptCodeType_ == em_Script_CodeType::em_Script_CodeType_If ? L"if" : L"while";
 	ScriptCode.pCode = pScriptCodeIf;
 	DefMethodContent_.VecScriptCode.push_back(std::move(ScriptCode));
 	return TRUE;
@@ -561,6 +564,7 @@ BOOL MyTools::CScript::AnalysisCode_Method(_In_ CONST std::wstring& wsContent, _
 	}
 
 	Script_Code ScriptCode;
+	ScriptCode.wsSourceText = wsContent;
 	ScriptCode.pCode = pScriptCodeMethod;
 	DefMethodContent_.VecScriptCode.push_back(std::move(ScriptCode));
 	return TRUE;
