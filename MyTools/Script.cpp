@@ -507,7 +507,7 @@ BOOL MyTools::CScript::AnalysisCode_If(_In_ em_Script_CodeType emScriptCodeType_
 	pScriptCodeIf->wsMethodName = std::move(CCharacter::Trim_W(Text));
 	
 	Script_Code ScriptCode;
-	ScriptCode.wsSourceText = emScriptCodeType_ == em_Script_CodeType::em_Script_CodeType_If ? L"if" : L"while";
+	ScriptCode.wsSourceText = wsContent;
 	ScriptCode.pCode = pScriptCodeIf;
 	DefMethodContent_.VecScriptCode.push_back(std::move(ScriptCode));
 	return TRUE;
