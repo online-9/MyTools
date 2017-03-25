@@ -255,7 +255,7 @@ BOOL CLPublic::SendKeys(const wchar_t* data)
 	short vk;
 	BOOL shift;
 	size_t len = wcslen(data);
-	for (int i = 0; i < len; i++)
+	for (size_t i = 0; i < len; i++)
 	{
 		if (data[i] >= 0 && data[i] < 256) //ascii×Ö·û
 		{
