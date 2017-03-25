@@ -58,14 +58,14 @@ public:
 	}
 
 	template<class T, class Fn>
-	inline static UINT Vec_erase_if(_In_ std::vector<T>& vlst, _In_ Fn _Pred)
+	inline static size_t Vec_erase_if(_In_ std::vector<T>& vlst, _In_ Fn _Pred)
 	{	
 		vlst.erase(std::remove_if(vlst.begin(), vlst.end(), _Pred), vlst.end());
 		return vlst.size();
 	}
 
 	template<class T, class Fn>
-	inline static UINT Dque_erase_if(_In_ std::deque<T>& vlst, _In_ Fn _Pred)
+	inline static size_t Dque_erase_if(_In_ std::deque<T>& vlst, _In_ Fn _Pred)
 	{
 		vlst.erase(std::remove_if(vlst.begin(), vlst.end(), _Pred), vlst.end());
 		return vlst.size();

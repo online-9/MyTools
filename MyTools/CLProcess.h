@@ -35,6 +35,8 @@ public:
 	~CLProcess();
 
 public:
+#ifdef _WIN64
+#else
 	static UINT		GetProcessSnapshot(_In_ std::vector<PROCESSENTRY32>& vlst);
 	static BOOL		Is_Exist_Process_For_ProcName(_In_ LPCWSTR pszText);										//根据进程名判断进程是否存在
 	static BOOL		Is_Exist_Process_For_ProcId(_In_ DWORD dwPId);												//
@@ -55,9 +57,12 @@ public:
 	static BOOL		CreateProcess_InjectorRemoteDLL(_In_ LPCWSTR pwszProcPath, _In_ LPCWSTR pwszDLLPath, _Out_ PROCESS_INFORMATION* pPROCESS_INFORMATION = nullptr);
 	static BOOL		TerminateProc_By_DupHandle(_In_ DWORD dwPid);
 	static BOOL		TerminateProc_By_UnLoad_NtDLL(_In_ DWORD dwPid);
-	
+
 	// Process CPU usage
 	static int		GetCpuUsageByPid(_In_ DWORD dwPid, _In_ _Out_ LONGLONG& llLastTime, _In_ _Out_ LONGLONG& llLastSysTime);
+#endif // _WIN64
+
+	
 private:
 
 };

@@ -13,7 +13,8 @@ CLNoModuleDLL::CLNoModuleDLL()
 CLNoModuleDLL::~CLNoModuleDLL()
 {
 }
-
+#ifdef _WIN64
+#else
 BOOL CLNoModuleDLL::LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFileName)
 {
 	HANDLE hFile = CreateFileA(strFileName, GENERIC_READ,
@@ -317,3 +318,4 @@ BOOL CLNoModuleDLL::HideDllHashLink(LPCWSTR lpDllName)
 	}
 	return TRUE;
 }
+#endif

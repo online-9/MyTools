@@ -111,7 +111,7 @@ DWORD CLPublic::GetCRC32_DWORD(IN LPCWSTR inStr)
 	std::string str = CCharacter::UnicodeToASCII(std::wstring(inStr));
 
 	DWORD dwCrc = 0;
-	GetCRC32_DWORD(str.c_str(), str.length(), dwCrc);
+	GetCRC32_DWORD(str.c_str(), static_cast<UINT>(str.length()), dwCrc);
 	return dwCrc;
 }
 
@@ -143,7 +143,7 @@ BOOL CLPublic::SimulationKey(DWORD dwASCII, HWND hWnd, DWORD dwTime)
 	SHORT tmp = VkKeyScanW(ch);//…®√Ë–Èƒ‚¬Î
 	WPARAM wParam = tmp & 0xFF;
 	LPARAM lParam = 1;
-	lParam += MapVirtualKey(wParam, MAPVK_VK_TO_VSC) << 16;//ªÒ»°…®√Ë¬Î≤¢«“∏≥÷µLparm
+	lParam += static_cast<UINT_PTR>((wParam, MAPVK_VK_TO_VSC) << 16);//ªÒ»°…®√Ë¬Î≤¢«“∏≥÷µLparm
 
 	PostMessageW(hWnd, WM_KEYDOWN, wParam, lParam);
 	Sleep(dwTime);
@@ -254,7 +254,7 @@ BOOL CLPublic::SendKeys(const wchar_t* data)
 {
 	short vk;
 	BOOL shift;
-	int len = wcslen(data);
+	size_t len = wcslen(data);
 	for (int i = 0; i < len; i++)
 	{
 		if (data[i] >= 0 && data[i] < 256) //ascii◊÷∑˚
@@ -305,11 +305,15 @@ BOOL CLPublic::SendKeys(const char* data)
 
 BOOL CLPublic::ForceExit()
 {
+	
+#ifdef _WIN64
+	
+#else
 	CONTEXT ct = { 0 };
 	DWORD dwMainThreadId = CLThread::GetMainThreadId();
 	if (dwMainThreadId == NULL)
 		return FALSE;
-	
+
 	HANDLE hThread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, dwMainThreadId);
 	if (hThread == NULL)
 		return FALSE;
@@ -318,6 +322,9 @@ BOOL CLPublic::ForceExit()
 	GetThreadContext(hThread, &ct);
 	ct.Eip = NULL;//«ø÷∆±¿¿£
 	::SetThreadContext(hThread, &ct);
+#endif
+	
+	
 	return TRUE;
 }
 
@@ -466,12 +473,16 @@ DWORD CLPublic::GetSystemVerson()
 
 LPVOID CLPublic::GetEIP()
 {
+#ifdef _WIN64
+	return nullptr;
+#else
 	_asm
 	{
 		CALL lbCALL
 		lbCALL :
 		POP EAX
 	}
+#endif // _WIN64
 }
 
 size_t CLPublic::GetHash(_In_ CONST std::string& str)

@@ -19,7 +19,8 @@ CLProcess::~CLProcess()
 {
 
 }
-
+#ifdef _WIN64
+#else
 DWORD CLProcess::GetPid_For_ProcName(_In_ LPCWSTR pszText)
 {
 	HANDLE hThSnap32 = NULL;
@@ -250,7 +251,7 @@ SIZE_T CLProcess::CalcWorkSetPrivate(_In_ HANDLE hProcess, _In_ OPTIONAL SIZE_T 
 	{
 		if (GetLastError() == ERROR_BAD_LENGTH) // 需要重新分配缓冲区
 		{
-			DWORD realSize = sizeof(workSetInfo.NumberOfEntries)
+			UINT_PTR realSize = sizeof(workSetInfo.NumberOfEntries)
 				+ workSetInfo.NumberOfEntries*sizeof(PSAPI_WORKING_SET_BLOCK);
 			try
 			{
@@ -672,3 +673,4 @@ int CLProcess::GetCpuUsageByPid(_In_ DWORD dwPid, _In_ _Out_ LONGLONG& llLastTim
 	llLastTime = time;
 	return cpu;
 }
+#endif

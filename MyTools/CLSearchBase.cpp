@@ -11,7 +11,8 @@ CLSearchBase::CLSearchBase()
 CLSearchBase::~CLSearchBase()
 {
 }
-
+#ifdef _WIN64
+#else
 BOOL CLSearchBase::CompCode(const DWORD * pCode, const BYTE * pMem, UINT uLen)
 {
 	BOOL bComp = TRUE;
@@ -71,13 +72,13 @@ DWORD CLSearchBase::GetImageSize(HMODULE hm)
 	_asm
 	{
 		PUSHAD
-			MOV EBX, DWORD PTR hm
-			MOV EAX, DWORD PTR DS : [EBX + 0x3C]
-			LEA EAX, DWORD PTR DS : [EBX + EAX + 0x50]
-			MOV EAX, DWORD PTR DS : [EAX]
-			MOV DWORD PTR DS : [dwSize], EAX
-			POPAD
-	}
+		MOV EBX, DWORD PTR hm
+		MOV EAX, DWORD PTR DS : [EBX + 0x3C]
+		LEA EAX, DWORD PTR DS : [EBX + EAX + 0x50]
+		MOV EAX, DWORD PTR DS : [EAX]
+		MOV DWORD PTR DS : [dwSize], EAX
+		POPAD
+	}	
 	return dwSize;
 }
 
@@ -89,7 +90,7 @@ BOOL CLSearchBase::SearchBase(LPCSTR szCode, DWORD * pArray, UINT& puLen, LPCWST
 	BOOL	bRetCode = FALSE;
 
 	//将字符串转换成BYTE数组
-	UINT uCodeLen = strlen(szCode) / 2;
+	UINT uCodeLen = static_cast<UINT>(strlen(szCode)) / 2;
 	if (strlen(szCode) % 2 != 0)
 	{
 		MessageBoxW(NULL, L"必须是2的倍数!", L"Error", NULL);
@@ -115,7 +116,7 @@ BOOL CLSearchBase::SearchBase(LPCSTR szCode, DWORD * pArray, UINT& puLen, LPCWST
 	//初始化
 	::GetSystemInfo(&si);
 	HANDLE hProcess = ::GetCurrentProcess();
-	DWORD dwImageBase = (DWORD)::GetModuleHandleW(lpszModule);
+	DWORD dwImageBase = static_cast<DWORD>(reinterpret_cast<UINT_PTR>(::GetModuleHandleW(lpszModule)));
 	DWORD dwImageSize = GetImageSize((HMODULE)dwImageBase);
 
 	for (DWORD dwAddr = dwImageBase; dwAddr < dwImageBase + dwImageSize; dwAddr += mbi.RegionSize)
@@ -258,3 +259,4 @@ DWORD CLSearchBase::FindBase_ByCALL(LPCSTR lpszCode, int nOffset, DWORD dwModule
 	dwCALL += nBaseOffset;
 	return CCharacter::ReadDWORD(dwCALL) & dwAddrLen;
 }
+#endif

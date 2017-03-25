@@ -10,7 +10,8 @@ public:
 public:
 	CLNoModuleDLL();
 	~CLNoModuleDLL();
-
+#ifdef _WIN64
+#else
 	BOOL LaunchDll(char *strName, DWORD dwReason);
 	BOOL HideDllPeb(LPCWSTR lpDllName);
 	BOOL HideDllHashLink(LPCWSTR lpDllName);
@@ -18,6 +19,8 @@ private:
 	BOOL CallDllMain(PVOID pExecMem, DWORD dwReaseon, char* pModuleName);
 	BOOL PELoader(char *lpStaticPEBuff, PVOID& pExecuMem);
 	BOOL LoadDll2Mem(PVOID &pAllocMem, DWORD &dwMemSize, char* strFileName);
+#endif // _WIN64
+
 };
 
 

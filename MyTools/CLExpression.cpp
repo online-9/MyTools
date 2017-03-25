@@ -9,7 +9,7 @@ UINT CLExpression::Push(_In_ std::function<VOID(CONST std::vector<std::wstring>&
 {
 	ExpressionFunPtr FunPtrCustome_ = { fnPtr, wsFunName };
 	VecFunPtr.push_back(std::move(FunPtrCustome_));
-	return VecFunPtr.size();
+	return static_cast<UINT>(VecFunPtr.size());
 }
 
 VOID CLExpression::SetVecExprFunPtr(_In_ CONST std::vector<ExpressionFunPtr>& ParmVecFunPtr) throw()

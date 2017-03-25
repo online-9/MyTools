@@ -129,6 +129,9 @@
     <ClCompile Include="Script.cpp">
       <Filter>Character\Script</Filter>
     </ClCompile>
+    <ClCompile Include="CLErrMsg.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -214,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="Script.h">
       <Filter>Character\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="CLErrMsg.h">
+      <Filter>Debug</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

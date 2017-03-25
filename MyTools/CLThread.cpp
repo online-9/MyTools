@@ -36,6 +36,9 @@ DWORD CLThread::GetMainThreadId()
 
 DWORD CLThread::SetThreadId(DWORD dwThreadId)
 {
+#ifdef _WIN64
+	return dwThreadId;
+#else
 	__try
 	{
 		//获取当前的线程ID
@@ -56,6 +59,7 @@ DWORD CLThread::SetThreadId(DWORD dwThreadId)
 		LOG_CF(CLog::em_Log_Type::em_Log_Type_Exception, L"SetThreadId出现异常");
 	}
 	return NULL;
+#endif // _WIN64	
 }
 
 BOOL CLThread::QueryThreadInfo_By_Pid(_In_ DWORD dwPid, _Out_ std::vector<CL_PROCESS_THREADINFO>& vlst)
@@ -169,7 +173,7 @@ BOOL CLThread::QueryThreadInfo_By_Pid(_In_ DWORD dwPid, _Out_ std::vector<CL_PRO
 			return FALSE;
 		};
 
-		hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, (DWORD)tbi.ClientId.UniqueProcess);
+		hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, static_cast<DWORD>(reinterpret_cast<UINT_PTR>(tbi.ClientId.UniqueProcess)));
 		if (hProcess == NULL)
 		{
 			CloseHandle(hThread);

@@ -369,7 +369,7 @@ DWORD CLExpressionCalc::CalcResult_By_Parm(_In_ DWORD dwNumberLeft, _In_ DWORD d
 	switch (emSymbolType)
 	{
 	case em_Content_Type_LeftAddress: case em_Content_Type_RightAddress:
-		return CCharacter::ReadDWORD(dwNumberLeft);
+		return static_cast<DWORD>(CCharacter::ReadDWORD(static_cast<UINT_PTR>(dwNumberLeft)));
 	case em_Content_Type_Symbol_Add:
 		return dwNumberLeft + dwNumberRight;
 	case em_Content_Type_Symbol_Sub:

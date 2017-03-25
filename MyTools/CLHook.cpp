@@ -16,13 +16,15 @@ CLHook::~CLHook()
 }
 
 HOOK_ITEM HookItem = { 0 };
-
+#ifdef _WIN64
+#else
 BOOL CLHook::Hook_Fun_Jmp_MyAddr(MYHOOK_CONTENT* pHookContent)
 {
 	__try
 	{
 		if (pHookContent == nullptr)
 			return FALSE;
+
 
 		// 初始化变量
 		BYTE bJmpFlag = 0xE9;
@@ -60,6 +62,9 @@ BOOL CLHook::Hook_Fun_Jmp_MyAddr(MYHOOK_CONTENT* pHookContent)
 		DWORD dwProtect = NULL;
 		::VirtualProtect((LPVOID)pHookContent->dwHookAddr, 8, dwOldProtent, &dwProtect);
 		PushHookList(pHookContent);
+
+
+		
 		return TRUE;
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
@@ -159,3 +164,4 @@ VOID CLHook::Release()
 {
 	CLPublic::Vec_erase_if(GetHookList(), [](CONST MYHOOK_CONTENT& itm){ UnHook_Fun_Jmp_MyAddr(&itm); return TRUE; });
 }
+#endif // _WIN64
