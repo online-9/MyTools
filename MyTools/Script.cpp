@@ -305,7 +305,7 @@ BOOL MyTools::CScript::ExcuteScriptCode(_In_ CONST std::wstring& wsMethodName, _
 			return ExcuteCustMethod(wsMethodName, static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode));
 		}
 
-		PrintLog(__LINE__, L"UnExist Method:%s", wsMethodName.c_str());
+		PrintLog(__LINE__, L"UnExist Method:%s", static_cast<CONST Script_Code_Method *>(ScriptCode_.pCode)->wsMethodName.c_str());
 		return FALSE;
 	default:
 		break;
