@@ -30,11 +30,6 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 	_vsnwprintf_s(szBuff, _countof(szBuff) - 1, _TRUNCATE, pwszFormat, args);
 	va_end(args);
 
-	if (bMsgBox)
-	{
-		::MessageBoxW(NULL, szBuff, wsClientName.c_str(), NULL);
-	}
-
 	LogContent LogContent_;
 	LogContent_.emLogType = emLogType;
 	LogContent_.uLine = nLine;
@@ -56,6 +51,11 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 		AddLogContentToQueue(LogContent_);
 		//static CLLock Lock(L"Log.Print.Lock");
 		//Lock.Access([LogContent_, this]{ PrintTo(LogContent_); });
+	}
+
+	if (bMsgBox)
+	{
+		::MessageBoxW(NULL, szBuff, wsClientName.c_str(), NULL);
 	}
 }
 
