@@ -125,6 +125,12 @@ namespace MyTools
 			ULONG			ulCodeHash;
 		};
 
+		struct Script_Current_ExcuteMethod
+		{
+			CONST Script_Code_Method*	pScript_Code_Method;
+			std::wstring				wsDefMethodName;
+		};
+
 	public:
 		CScript();
 		~CScript();
@@ -188,7 +194,7 @@ namespace MyTools
 		std::function<VOID(CONST std::wstring&, int nLine, CONST std::wstring&)> _fnLogPtr;
 		std::function<BOOL(CONST Script_Code_If&)> _fnIfPtr;
 		std::function<BOOL(CONST Script_Code_If&)> _fnWhilePtr;
-		CONST Script_Code_Method* _pCurrentMethodContent;
+		Script_Current_ExcuteMethod _Script_Current_ExcuteMethod;
 		CONST Script_Code* _pCurrentScriptCode;
 	};
 

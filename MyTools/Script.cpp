@@ -319,7 +319,7 @@ VOID MyTools::CScript::ExuteExtendLoop(_In_ CONST std::wstring& wsExcuteMethodNa
 	RemoveQueue();
 
 	// Excute Again Method
-	AddExcuteQueue(static_cast<CONST Script_Code_Method *>(CurrentScriptCode_.pCode)->wsMethodName, CurrentScriptCode_.ulCodeHash);
+	AddExcuteQueue(_Script_Current_ExcuteMethod.wsDefMethodName, CurrentScriptCode_.ulCodeHash);
 
 	// Excute DefMethod
 	AddExcuteQueue(wsExcuteMethodName, NULL);
@@ -337,14 +337,15 @@ VOID MyTools::CScript::ExcuteLoop(_In_ CONST std::wstring& wsMethodName, _In_ CO
 	AddExcuteQueue(static_cast<CONST Script_Code_If *>(CurrentScriptCode_.pCode)->wsMethodName, NULL);
 }
 
-BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring&, _In_ CONST Script_Code_Method* pCodeMethod)
+BOOL MyTools::CScript::ExcuteCustMethod(_In_ CONST std::wstring& wsDefMethodName, _In_ CONST Script_Code_Method* pCodeMethod)
 {
 	auto p = ExistCustMethod(pCodeMethod->wsMethodName);
-	auto fnExcuteCustomeFun = [p, pCodeMethod, this]()
+	auto fnExcuteCustomeFun = [p, pCodeMethod, this, wsDefMethodName]()
 	{
 		__try
 		{
-			_pCurrentMethodContent = pCodeMethod;
+			_Script_Current_ExcuteMethod.pScript_Code_Method = pCodeMethod;
+			_Script_Current_ExcuteMethod.wsDefMethodName = wsDefMethodName;
 			return p->MethodPtr();
 		}
 		__except (1)
