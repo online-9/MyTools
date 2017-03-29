@@ -11,7 +11,6 @@ MyTools::CScript::CScript()
 	_fnExceptionPtr = nullptr;
 	_fnIfPtr = nullptr;
 	_fnWhilePtr = nullptr;
-	_pCurrentMethodContent = nullptr;
 	_pCurrentScriptCode = nullptr;
 }
 
