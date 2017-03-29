@@ -166,6 +166,12 @@ BOOL MyTools::CScript::FileContentToCode(_In_ CONST std::vector<std::wstring>& V
 
 		if (CLPublic::Vec_find_if(_VecCode, static_cast<Script_Code_DefMethod *>(nullptr), [DefMethod_](CONST Script_Code_DefMethod& ScriptCodeDefMethod) { return ScriptCodeDefMethod.wsMethodName == DefMethod_.wsMethodName; }))
 		{
+			LOG_CF_E(L"i=%d,Text=%s", i, itm.c_str());
+			for (int j = 0; j < VecFileContent.size(); ++j)
+			{
+				CONST auto& tmp = VecFileContent.at(j);
+				LOG_CF_E(L"j=%d,Text=%s", j, tmp.c_str());
+			}
 			PrintLog(__LINE__, L"Already Exist DefMethod:%s", DefMethod_.wsMethodName.c_str());
 			return FALSE;
 		}

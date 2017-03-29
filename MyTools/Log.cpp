@@ -93,13 +93,13 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	wsClientName = cwsClientName;
 	bRun = TRUE;
 	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
-	SetResDeleter(hWorkThread, [](HANDLE& hThread){::CloseHandle(hThread); });
+	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
 	auto hSendThread = cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
-	SetResDeleter(hSendThread, [](HANDLE& hThread){ ::CloseHandle(hThread); });
+	SetResDeleter(hSendThread, [](HANDLE& hThread) { ::CloseHandle(hThread); });
 
 	auto hSaveThread = cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
-	SetResDeleter(hSaveThread, [](HANDLE& hThread){::CloseHandle(hThread); });
+	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
@@ -255,10 +255,11 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 
 		HANDLE hBufferEvent = ::OpenEventW(EVENT_ALL_ACCESS, FALSE, CL_LOG_BUFFER_EVENT);
 		if (hBufferEvent == NULL)
-		{
-			::CloseHandle(hBufferEvent);
 			return FALSE;
-		}
+
+		HANDLE hCopyMemoryEvent = ::OpenEventW(EVENT_ALL_ACCESS, FALSE, CL_LOG_READMEMORY_EVENT);
+		if (hCopyMemoryEvent == NULL)
+			return FALSE;
 
 		HANDLE hFileMap = ::OpenFileMappingW(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, CL_LOG_SHAREMEM);
 		if (hFileMap == NULL)
@@ -296,11 +297,13 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 			{
 				*pLogContent = LogContent_;
 				::SetEvent(hBufferEvent);
+				::WaitForSingleObject(hCopyMemoryEvent, 1000);
 			}
 		}
 
 		::UnmapViewOfFile(pLogContent);
 		::CloseHandle(hFileMap);
+		::CloseHandle(hCopyMemoryEvent);
 		::CloseHandle(hBufferEvent);
 		::CloseHandle(hReadyEvent);
 	}
@@ -362,7 +365,7 @@ DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
 		return 0;
 	}
 
-	
+
 	while (pTestLog->bRun)
 	{
 		::SetEvent(hReadyEvent);
@@ -409,7 +412,7 @@ VOID CLog::AddLogContentToQueue(_In_ CONST LogContent& LogContent_)
 		if (QueueLogContent.size() >= 1000)
 			return;
 
-		QueueLogContent.push(std::move(LogContent_));
+		QueueLogContent.push(LogContent_);
 	});
 }
 
@@ -435,7 +438,7 @@ VOID CLog::AddSaveLogToQueue(_In_ CONST LogContent& LogContent_)
 		if (QueueSaveLogContent.size() >= 1000)
 			return;
 
-		QueueSaveLogContent.push(std::move(LogContent_));
+		QueueSaveLogContent.push(LogContent_);
 	});
 }
 
