@@ -9,12 +9,13 @@
 #include "CLExpressionCalc.h"
 #include "CLResManager.h"
 #include <Shlwapi.h>
+#include <mutex>
 
 #define _SELF L"Log.cpp"
 
 CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue"), Lock_SaveLogContentQueue(L"Lock_SaveLogContentQueue")
 {
-	ZeroMemory(&CurrentSysTime, sizeof(CurrentSysTime));
+
 }
 
 CLog::~CLog()
@@ -36,22 +37,15 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 	CCharacter::wstrcpy_my(LogContent_.wszClientName, wsClientName.c_str(), _countof(LogContent_.wszClientName) - 1);
 	CCharacter::wstrcpy_my(LogContent_.wszFileName, pwszFileName, _countof(LogContent_.wszFileName) - 1);
 	CCharacter::wstrcpy_my(LogContent_.wszFunName, pwszFunName, _countof(LogContent_.wszFunName) - 1);
-	CCharacter::wstrcpy_my(LogContent_.wszLogContent, szBuff, _countof(LogContent_.wszLogContent));
+	CCharacter::wstrcpy_my(LogContent_.wszLogContent, szBuff, _countof(LogContent_.wszLogContent) - 1);
 
 	LogContent_.uRepeatCount = 0;
 	LogContent_.uStackCount = 0;
 
 	if (nLogOutputType & LOG_TYPE_FILE)
-	{
 		AddSaveLogToQueue(LogContent_);
-		//SaveLog(LogContent_);
-	}
 	if (nLogOutputType & LOG_TYPE_CONSOLE)
-	{
 		AddLogContentToQueue(LogContent_);
-		//static CLLock Lock(L"Log.Print.Lock");
-		//Lock.Access([LogContent_, this]{ PrintTo(LogContent_); });
-	}
 
 	if (bMsgBox)
 	{
@@ -91,7 +85,6 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 
 	wsClientName = cwsClientName;
-	bRun = TRUE;
 	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
 	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
@@ -109,7 +102,7 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	else
 	{
 		WCHAR wszText[64];
-		swprintf_s(wszText, _countof(wszText), L"%s_%d-%d-%d.log", cwsClientName.c_str(), SysTime.wYear, SysTime.wMonth, SysTime.wDay);
+		swprintf_s(wszText, _countof(wszText), L"%s_%d-%d-%d.log", cwsClientName.c_str(), static_cast<DWORD>(SysTime.wYear), static_cast<DWORD>(SysTime.wMonth), static_cast<DWORD>(SysTime.wDay));
 		wsLogFilePath = wsSaveLogPath + wszText;
 	}
 
@@ -123,10 +116,14 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 			CLFile::WriteUnicodeFile(wsLogFilePath, L"");;
 	}
 
-	CurrentSysTime = SysTime;
+	memcpy(&CurrentSysTime, &SysTime, sizeof(SysTime));
 	m_bOverWrite = bOverWrite;
+
 	LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"------------Run Time=[%d-%d-%d %d:%d:%d] ----------------------------", \
-		SysTime.wYear, SysTime.wMonth, SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond);
+		static_cast<DWORD>(SysTime.wYear), static_cast<DWORD>(SysTime.wMonth), static_cast<DWORD>(SysTime.wDay), static_cast<DWORD>(SysTime.wHour), \
+		static_cast<DWORD>(SysTime.wMinute), static_cast<DWORD>(SysTime.wSecond));
+
+	bRun = TRUE;
 }
 
 CLExpression& CLog::GetLogExpr() throw()
@@ -184,19 +181,19 @@ BOOL CLog::PrintTo(_In_ CONST LogContent& LogContent_)
 	return TRUE;
 }
 
-BOOL CLog::SaveLog(_In_ LogContent& LogContent_)
+BOOL CLog::SaveLog(_In_ CONST LogContent& LogContent_) CONST
 {
-	WCHAR wszText[1024];
+	WCHAR wszText[1024] = { 0 };
 	std::wstring wsContent;
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
 
-	if ((!m_bOverWrite && SysTime.wDay != CurrentSysTime.wDay) || !CLPublic::FileExit(wsLogFilePath.c_str()))
+	if ((!m_bOverWrite && SysTime.wDay != CurrentSysTime.wDay) || !CLPublic::FileExist(wsLogFilePath))
 	{
 		// have to create new log!
 		WCHAR wszFileName[64];
-		swprintf_s(wszFileName, _countof(wszFileName), L"%s_%d-%d-%d.log", wsClientName.c_str(), SysTime.wYear, SysTime.wMonth, SysTime.wDay);
+		swprintf_s(wszFileName, _countof(wszFileName), L"%s_%d-%d-%d.log", wsClientName.c_str(), static_cast<DWORD>(SysTime.wYear), static_cast<DWORD>(SysTime.wMonth), static_cast<DWORD>(SysTime.wDay));
 
 		CCharacter::wstrcpy_my(wszText, wsLogFilePath.c_str(), _countof(wszText));
 		::PathRemoveFileSpec(wszText);
@@ -207,7 +204,7 @@ BOOL CLog::SaveLog(_In_ LogContent& LogContent_)
 	}
 
 	wsContent += L"#Stack:\r\n";
-	swprintf_s(wszText, _countof(wszText) - 1, L" #Time:%02d:%02d:%02d ", SysTime.wHour, SysTime.wMinute, SysTime.wSecond);
+	swprintf_s(wszText, _countof(wszText) - 1, L" #Time:%02d:%02d:%02d ", static_cast<DWORD>(SysTime.wHour), static_cast<DWORD>(SysTime.wMinute), static_cast<DWORD>(SysTime.wSecond));
 	wsContent += wszText;
 	wsContent += L" #Client:";
 	wsContent += LogContent_.wszClientName;
@@ -286,19 +283,19 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 				continue;
 			}
 
-			hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
-			if (hMutex == NULL)
-				break;
-
-			::CloseHandle(hMutex);
-			hMutex = NULL;
-
 			if (::WaitForSingleObject(hReadyEvent, 1000) != WAIT_TIMEOUT)
 			{
 				*pLogContent = LogContent_;
 				::SetEvent(hBufferEvent);
 				::WaitForSingleObject(hCopyMemoryEvent, 1000);
 			}
+
+			hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
+			if (hMutex == NULL)
+				break;
+
+			::CloseHandle(hMutex);
+			hMutex = NULL;
 		}
 
 		::UnmapViewOfFile(pLogContent);
@@ -365,15 +362,15 @@ DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
 		return 0;
 	}
 
-
+	::SetEvent(hReadyEvent);
 	while (pTestLog->bRun)
 	{
-		::SetEvent(hReadyEvent);
 		if (::WaitForSingleObject(hBufferEvent, 50) == WAIT_TIMEOUT)
 			continue;
 
 		auto pCmdLogContent = std::make_shared<CmdLogContent>(*pLogContent);
 		pTestLog->ExcuteLogServerCmd(pCmdLogContent);
+		::SetEvent(hReadyEvent);
 	}
 
 	::UnmapViewOfFile(pLogContent);
@@ -423,7 +420,7 @@ BOOL CLog::GetLogContentForQueue(_Out_ LogContent& LogContent_)
 	{
 		if (!QueueLogContent.empty())
 		{
-			LogContent_ = QueueLogContent.front();
+			LogContent_ = std::move(QueueLogContent.front());
 			QueueLogContent.pop();
 			bExist = TRUE;
 		}
@@ -438,7 +435,7 @@ VOID CLog::AddSaveLogToQueue(_In_ CONST LogContent& LogContent_)
 		if (QueueSaveLogContent.size() >= 1000)
 			return;
 
-		QueueSaveLogContent.push(LogContent_);
+		QueueSaveLogContent.push(std::move(LogContent_));
 	});
 }
 
@@ -449,7 +446,7 @@ BOOL CLog::GetSaveLogContentForQueue(_Out_ LogContent& LogContent_)
 	{
 		if (!QueueSaveLogContent.empty())
 		{
-			LogContent_ = QueueSaveLogContent.front();
+			LogContent_ = std::move(QueueSaveLogContent.front());
 			QueueSaveLogContent.pop();
 			bExist = TRUE;
 		}
