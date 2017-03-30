@@ -15,7 +15,7 @@
 
 CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue"), Lock_SaveLogContentQueue(L"Lock_SaveLogContentQueue")
 {
-	
+
 }
 
 CLog::~CLog()
@@ -84,7 +84,7 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 
-	wsClientName = cwsClientName;	
+	wsClientName = cwsClientName;
 	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
 	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
