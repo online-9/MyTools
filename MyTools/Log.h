@@ -79,6 +79,9 @@ private:
 public:
 	CLog();
 	~CLog();
+
+	CLog& operator = (CONST CLog&) = delete;
+	CLog(CONST CLog&) = delete;
 public:
 	VOID Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int nLine, _In_ int nLogOutputType, _In_ em_Log_Type emLogType, _In_ BOOL bMsgBox, _In_ LPCWSTR pwszFormat, ...);
 
@@ -93,7 +96,7 @@ public:
 private:
 	BOOL PrintTo(_In_ CONST LogContent& LogContent_);
 
-	BOOL SaveLog(_In_ LogContent& LogContent_);
+	BOOL SaveLog(_In_ CONST LogContent& LogContent_) CONST;
 
 	static DWORD WINAPI _WorkThread(LPVOID lpParm);
 	static DWORD WINAPI _SendThread(LPVOID lpParm);
@@ -113,7 +116,7 @@ private:
 	std::queue<LogContent> QueueSaveLogContent;
 
 	SYSTEMTIME CurrentSysTime;
-	std::wstring wsLogFilePath;
+	mutable std::wstring wsLogFilePath;
 	std::wstring wsClientName;
 	HANDLE hSaveLogEvent;
 	HANDLE hReleaseEvent;
