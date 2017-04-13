@@ -124,6 +124,7 @@ private:
 	HANDLE hSendExitEvent;
 	BOOL bRun;
 	BOOL m_bOverWrite;
+	ULONGLONG _ulMaxFileSize;
 	CLLock Lock_LogContentQueue;
 	CLLock Lock_SaveLogContentQueue;
 private:

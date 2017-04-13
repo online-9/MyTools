@@ -13,7 +13,7 @@
 
 #define _SELF L"Log.cpp"
 
-CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue"), Lock_SaveLogContentQueue(L"Lock_SaveLogContentQueue")
+CLog::CLog() : wsClientName(L"Empty"), bRun(FALSE), m_bOverWrite(TRUE), Lock_LogContentQueue(L"Lock_LogContentQueue"), Lock_SaveLogContentQueue(L"Lock_SaveLogContentQueue"), _ulMaxFileSize(NULL)
 {
 
 }
@@ -85,14 +85,6 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 
 	wsClientName = cwsClientName;
-	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
-	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
-
-	auto hSendThread = cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
-	SetResDeleter(hSendThread, [](HANDLE& hThread) { ::CloseHandle(hThread); });
-
-	auto hSaveThread = cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
-	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
 	SYSTEMTIME SysTime;
 	::GetLocalTime(&SysTime);
@@ -118,12 +110,21 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 
 	memcpy(&CurrentSysTime, &SysTime, sizeof(SysTime));
 	m_bOverWrite = bOverWrite;
+	_ulMaxFileSize = ulMaxSize;
 
 	LOG_CF(CLog::em_Log_Type::em_Log_Type_Debug, L"------------Run Time=[%d-%d-%d %d:%d:%d] ----------------------------",							\
 		static_cast<DWORD>(SysTime.wYear), static_cast<DWORD>(SysTime.wMonth), static_cast<DWORD>(SysTime.wDay), static_cast<DWORD>(SysTime.wHour), \
 		static_cast<DWORD>(SysTime.wMinute), static_cast<DWORD>(SysTime.wSecond));
 
 	bRun = TRUE;
+	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
+	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
+
+	auto hSendThread = cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
+	SetResDeleter(hSendThread, [](HANDLE& hThread) { ::CloseHandle(hThread); });
+
+	auto hSaveThread = cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
+	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 }
 
 CLExpression& CLog::GetLogExpr() throw()
@@ -203,6 +204,16 @@ BOOL CLog::SaveLog(_In_ CONST LogContent& LogContent_) CONST
 		CLFile::WriteUnicodeFile(wsLogFilePath, L"");;
 	}
 
+	static int Count = 0;
+	if (++Count % 100 == 0)
+	{
+		ULONG ulLen = 0;
+		CLFile::ReadAsciiFileLen(wsLogFilePath, ulLen);
+		if (ulLen >= _ulMaxFileSize)
+			CLFile::WriteUnicodeFile(wsLogFilePath, L"");;
+	}
+	
+
 	wsContent += L"#Stack:\r\n";
 	swprintf_s(wszText, _countof(wszText) - 1, L" #Time:%02d:%02d:%02d ", static_cast<DWORD>(SysTime.wHour), static_cast<DWORD>(SysTime.wMinute), static_cast<DWORD>(SysTime.wSecond));
 	wsContent += wszText;
@@ -243,8 +254,7 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 			continue;
 		}
 
-		::CloseHandle(hMutex);
-		hMutex = NULL;
+		::ReleaseMutex(hMutex);
 
 		HANDLE hReadyEvent = ::OpenEvent(EVENT_ALL_ACCESS, FALSE, CL_LOG_READY_EVENT);
 		if (hReadyEvent == NULL)
@@ -252,10 +262,6 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 
 		HANDLE hBufferEvent = ::OpenEventW(EVENT_ALL_ACCESS, FALSE, CL_LOG_BUFFER_EVENT);
 		if (hBufferEvent == NULL)
-			return FALSE;
-
-		HANDLE hCopyMemoryEvent = ::OpenEventW(EVENT_ALL_ACCESS, FALSE, CL_LOG_READMEMORY_EVENT);
-		if (hCopyMemoryEvent == NULL)
 			return FALSE;
 
 		HANDLE hFileMap = ::OpenFileMappingW(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, CL_LOG_SHAREMEM);
@@ -287,20 +293,18 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 			{
 				*pLogContent = LogContent_;
 				::SetEvent(hBufferEvent);
-				::WaitForSingleObject(hCopyMemoryEvent, 1000);
 			}
 
 			hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer
 			if (hMutex == NULL)
 				break;
 
-			::CloseHandle(hMutex);
+			::ReleaseMutex(hMutex);
 			hMutex = NULL;
 		}
 
 		::UnmapViewOfFile(pLogContent);
 		::CloseHandle(hFileMap);
-		::CloseHandle(hCopyMemoryEvent);
 		::CloseHandle(hBufferEvent);
 		::CloseHandle(hReadyEvent);
 	}
