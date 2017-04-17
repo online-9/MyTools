@@ -56,12 +56,6 @@ VOID CLog::Print(_In_ LPCWSTR pwszFunName, _In_ LPCWSTR pwszFileName, _In_ int n
 VOID CLog::Release()
 {
 	bRun = FALSE;
-	if (hReleaseEvent != NULL)
-	{
-		::WaitForSingleObject(hReleaseEvent, INFINITE);
-		::CloseHandle(hReleaseEvent);
-		hReleaseEvent = NULL;
-	}
 	if (hSendExitEvent != NULL)
 	{
 		::WaitForSingleObject(hSendExitEvent, INFINITE);
@@ -78,7 +72,6 @@ VOID CLog::Release()
 
 VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std::wstring wsSaveLogPath, _In_ BOOL bOverWrite, _In_ ULONG ulMaxSize)
 {
-	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 

@@ -115,7 +115,6 @@ private:
 	mutable std::wstring wsLogFilePath;
 	std::wstring wsClientName;
 	HANDLE hSaveLogEvent;
-	HANDLE hReleaseEvent;
 	HANDLE hSendExitEvent;
 	BOOL bRun;
 	BOOL m_bOverWrite;
