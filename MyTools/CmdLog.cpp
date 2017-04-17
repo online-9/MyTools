@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CmdLog.h"
 #include <thread>
+#include <WS2tcpip.h>
 #include "Log.h"
 #include "CLExpressionCalc.h"
 #include "Character.h"
@@ -108,7 +109,8 @@ BOOL CCmdLog::ConnectLogServer()
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(em_CmdLog_Port);
-	addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1"); 
+
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
 	return connect(_skClient, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR ? FALSE : TRUE;
 }
 
