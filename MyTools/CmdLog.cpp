@@ -6,6 +6,7 @@
 #include "CLExpressionCalc.h"
 #include "Character.h"
 #pragma  comment (lib,"wsock32.lib") 
+#pragma  comment (lib, "Ws2_32.lib")
 
 #define _SELF L"CmdLog.cpp"
 CCmdLog::CCmdLog() : _Run(FALSE), _skClient(INVALID_SOCKET), _hRecvThread(NULL)
@@ -15,7 +16,7 @@ CCmdLog::CCmdLog() : _Run(FALSE), _skClient(INVALID_SOCKET), _hRecvThread(NULL)
 
 CCmdLog::~CCmdLog()
 {
-
+	
 }
 
 BOOL CCmdLog::Run(_In_ CONST std::wstring& wsClientName, _In_ CONST std::vector<ExpressionFunPtr>& ParmVecFunPtr)
