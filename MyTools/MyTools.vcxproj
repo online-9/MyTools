@@ -130,6 +130,8 @@
     <ClCompile Include="CLProcess.cpp" />
     <ClCompile Include="CLSearchBase.cpp" />
     <ClCompile Include="CLThread.cpp" />
+    <ClCompile Include="CmdLog.cpp" />
+    <ClCompile Include="CmdLogServer.cpp" />
     <ClCompile Include="CPublic.cpp" />
     <ClCompile Include="CLNoModuleDLL.cpp" />
     <ClCompile Include="DES.cpp" />
@@ -161,6 +163,8 @@
     <ClInclude Include="CLThread.h" />
     <ClInclude Include="CLVector.h" />
     <ClInclude Include="CLNoModuleDLL.h" />
+    <ClInclude Include="CmdLog.h" />
+    <ClInclude Include="CmdLogServer.h" />
     <ClInclude Include="DES.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="RC4.hpp" />

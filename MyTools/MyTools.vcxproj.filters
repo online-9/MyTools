@@ -132,6 +132,12 @@
     <ClCompile Include="CLErrMsg.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
+    <ClCompile Include="CmdLog.cpp">
+      <Filter>Debug\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdLogServer.cpp">
+      <Filter>Debug\Log</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -220,6 +226,12 @@
     </ClInclude>
     <ClInclude Include="CLErrMsg.h">
       <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdLog.h">
+      <Filter>Debug\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdLogServer.h">
+      <Filter>Debug\Log</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

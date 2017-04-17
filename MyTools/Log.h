@@ -49,6 +49,7 @@ private:
 	{
 		WCHAR wszClientName[32];
 		WCHAR wszCmd[1024];
+		DWORD dwHash;
 	};
 
 	struct LogContent
