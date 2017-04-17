@@ -102,9 +102,7 @@ BOOL CCmdLog::ConnectLogServer()
 			return FALSE;
 
 		CONST static int nSendTimeout = 3 * 1000;
-		CONST static int nRecvTimeout = 3 * 1000;
 		setsockopt(_skClient, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<CONST CHAR*>(&nSendTimeout), sizeof(int));
-		setsockopt(_skClient, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<CONST CHAR*>(&nRecvTimeout), sizeof(int));
 	}
 
 	sockaddr_in addr;
@@ -141,10 +139,17 @@ int CCmdLog::Send(_In_ CONST CHAR* Buffer, _In_ INT nLen)
 BOOL CCmdLog::Recv(_Out_ std::wstring& wsCmdText)
 {
 	RecvText RecvText_ = { 0 };
-	if (::recv(_skClient, reinterpret_cast<CHAR*>(&RecvText_), sizeof(RecvText_), 0) != sizeof(RecvText_))
+	int nRetCode = ::recv(_skClient, reinterpret_cast<CHAR*>(&RecvText_), sizeof(RecvText_), 0);
+	if (nRetCode == -1 || nRetCode != sizeof(RecvText_))
+	{
+		BreakLogConnect();
 		return FALSE;
+	}
 	else if (RecvText_.dwParm1 != 0x434C536F || RecvText_.dwParm2 != 0x69656E74)
+	{
+		BreakLogConnect();
 		return FALSE;
+	}
 
 	wsCmdText = RecvText_.wszText;
 	return TRUE;

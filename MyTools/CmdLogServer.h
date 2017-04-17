@@ -24,6 +24,8 @@ private:
 	static DWORD WINAPI _AcceptThread(LPVOID lpParm);
 
 	UINT GetClientSocket_By_ClientName(_In_ CONST std::wstring& wsClientName, _Out_ std::vector<SOCKET>& VecClientSocket) CONST;
+
+	VOID RemoveSocket(_In_ SOCKET skClient);
 private:
 	SOCKET _servSocket;
 	std::vector<CmdLogClient> _VecClient;

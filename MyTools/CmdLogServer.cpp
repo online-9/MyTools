@@ -4,6 +4,7 @@
 #include "CLPublic.h"
 #include <thread>
 
+#define _SELF L"CmdLogServer.cpp"
 CCmdLogServer::CCmdLogServer() : _LockCmdLogClient(L"LockCmdLogClient"), _Run(FALSE), _hAcceptThread(NULL), _servSocket(INVALID_SOCKET), _nSendTimeout(3 * 1000), _nRecvTimeout(3 * 1000)
 {
 
@@ -60,7 +61,7 @@ VOID CCmdLogServer::SendContent(_In_ CONST std::wstring& wsClientName, _In_ CONS
 {
 	std::vector<SOCKET> VecClientSocket;
 	GetClientSocket_By_ClientName(CCharacter::MakeTextToUpper(wsClientName) == L"ALL" ? L"" : wsClientName, VecClientSocket);
-	
+
 	for (CONST auto& itm : VecClientSocket)
 	{
 		CCmdLog::RecvText RecvText_;
@@ -68,7 +69,12 @@ VOID CCmdLogServer::SendContent(_In_ CONST std::wstring& wsClientName, _In_ CONS
 		RecvText_.dwParm2 = 0x69656E74;
 		CCharacter::wstrcpy_my(RecvText_.wszText, wsContent.c_str());
 
-		::send(itm, reinterpret_cast<CONST CHAR*>(&RecvText_), sizeof(RecvText_), 0);
+		if (::send(itm, reinterpret_cast<CONST CHAR*>(&RecvText_), sizeof(RecvText_), 0) == SOCKET_ERROR)
+		{
+			RemoveSocket(itm);
+			::shutdown(itm, SD_BOTH);
+			::closesocket(itm);
+		}
 	}
 }
 
@@ -128,4 +134,12 @@ UINT CCmdLogServer::GetClientSocket_By_ClientName(_In_ CONST std::wstring& wsCli
 		}
 	});
 	return VecClientSocket.size();
+}
+
+VOID CCmdLogServer::RemoveSocket(_In_ SOCKET skClient)
+{
+	_LockCmdLogClient.Access([this, skClient]
+	{
+		CLPublic::Vec_erase_if(_VecClient, [skClient](CONST CmdLogClient& CmdLogClient_){ return CmdLogClient_.skClient == skClient; });
+	});
 }
