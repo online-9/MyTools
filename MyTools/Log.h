@@ -4,7 +4,6 @@
 #include <memory>
 #include <queue>
 #include "ClassInstance.h"
-#include "CLExpression.h"
 #include "CLLock.h"
 
 #define LOG_TYPE_CONSOLE 0x2
@@ -93,17 +92,13 @@ public:
 
 	VOID Release();
 
-	CLExpression& GetLogExpr() throw();
 private:
 	BOOL PrintTo(_In_ CONST LogContent& LogContent_);
 
 	BOOL SaveLog(_In_ CONST LogContent& LogContent_) CONST;
 
-	static DWORD WINAPI _WorkThread(LPVOID lpParm);
 	static DWORD WINAPI _SendThread(LPVOID lpParm);
 	static DWORD WINAPI _SaveThread(LPVOID lpParm);
-
-	VOID ExcuteLogServerCmd(_In_ std::shared_ptr<CmdLogContent> CmdLogContent_);
 
 	VOID AddLogContentToQueue(_In_ CONST LogContent& LogContent_);
 
@@ -121,15 +116,12 @@ private:
 	std::wstring wsClientName;
 	HANDLE hSaveLogEvent;
 	HANDLE hReleaseEvent;
-	HANDLE hWorkExitEvent;
 	HANDLE hSendExitEvent;
 	BOOL bRun;
 	BOOL m_bOverWrite;
 	ULONGLONG _ulMaxFileSize;
 	CLLock Lock_LogContentQueue;
 	CLLock Lock_SaveLogContentQueue;
-private:
-	CLExpression Expr;
 };
 
 #endif

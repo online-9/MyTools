@@ -6,7 +6,6 @@
 #include "Character.h"
 #include "CLPublic.h"
 #include "CLFile.h"
-#include "CLExpressionCalc.h"
 #include "CLResManager.h"
 #include <Shlwapi.h>
 #include <mutex>
@@ -80,7 +79,6 @@ VOID CLog::Release()
 VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std::wstring wsSaveLogPath, _In_ BOOL bOverWrite, _In_ ULONG ulMaxSize)
 {
 	hReleaseEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
-	hWorkExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hSendExitEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 	hSaveLogEvent = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 
@@ -117,19 +115,12 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 		static_cast<DWORD>(SysTime.wMinute), static_cast<DWORD>(SysTime.wSecond));
 
 	bRun = TRUE;
-	auto hWorkThread = cbBEGINTHREADEX(NULL, NULL, _WorkThread, this, NULL, NULL);
-	SetResDeleter(hWorkThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 
 	auto hSendThread = cbBEGINTHREADEX(NULL, NULL, _SendThread, this, NULL, NULL);
 	SetResDeleter(hSendThread, [](HANDLE& hThread) { ::CloseHandle(hThread); });
 
 	auto hSaveThread = cbBEGINTHREADEX(NULL, NULL, _SaveThread, this, NULL, NULL);
 	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
-}
-
-CLExpression& CLog::GetLogExpr() throw()
-{
-	return Expr;
 }
 
 BOOL CLog::PrintTo(_In_ CONST LogContent& LogContent_)
@@ -310,100 +301,6 @@ DWORD WINAPI CLog::_SendThread(LPVOID lpParm)
 	}
 	::SetEvent(pTestLog->hSendExitEvent);
 	return 0;
-}
-
-DWORD WINAPI CLog::_WorkThread(LPVOID lpParm)
-{
-	auto pTestLog = reinterpret_cast<CLog*>(lpParm);
-
-	HANDLE hMutex = ::CreateMutexW(NULL, FALSE, CL_LOG_CMD_MUTEX);
-	if (hMutex == NULL)
-	{
-		MessageBoxW(NULL, L"CreateMutex Fiald!", L"Error", NULL);
-		::SetEvent(pTestLog->hReleaseEvent);
-		return 0;
-	}
-
-	HANDLE hReadyEvent = ::CreateEventW(NULL, FALSE, FALSE, CL_LOG_CMD_READY_EVENT);
-	if (hReadyEvent == NULL)
-	{
-		MessageBoxW(NULL, L"CreateEventW Fiald!", L"Error", NULL);
-		::CloseHandle(hMutex);
-		::SetEvent(pTestLog->hReleaseEvent);
-		return 0;
-	}
-
-	HANDLE hBufferEvent = ::CreateEventW(NULL, FALSE, FALSE, CL_LOG_CMD_BUFFER_EVENT);
-	if (hBufferEvent == NULL)
-	{
-		MessageBoxW(NULL, L"CreateEventW Fiald!", L"Error", NULL);
-		::CloseHandle(hBufferEvent);
-		::CloseHandle(hMutex);
-		::SetEvent(pTestLog->hReleaseEvent);
-		return 0;
-	}
-
-	HANDLE hMapFile = ::CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, NULL, sizeof(CmdLogContent), CL_LOG_CMD_SHAREMEM);
-	if (hMapFile == NULL)
-	{
-		MessageBoxW(NULL, L"CreateFileMappingW Fiald!", L"Error", NULL);
-		::CloseHandle(hReadyEvent);
-		::CloseHandle(hBufferEvent);
-		::CloseHandle(hMutex);
-		::SetEvent(pTestLog->hReleaseEvent);
-		return 0;
-	}
-
-	CmdLogContent* pLogContent = (CmdLogContent *)MapViewOfFile(hMapFile, FILE_MAP_READ, NULL, NULL, NULL);
-	if (pLogContent == NULL)
-	{
-		MessageBoxW(NULL, L"MapViewOfFile Fiald!", L"Error", NULL);
-		::CloseHandle(hReadyEvent);
-		::CloseHandle(hBufferEvent);
-		::CloseHandle(hMutex);
-		::CloseHandle(hMapFile);
-		::SetEvent(pTestLog->hReleaseEvent);
-		return 0;
-	}
-
-	::SetEvent(hReadyEvent);
-	while (pTestLog->bRun)
-	{
-		if (::WaitForSingleObject(hBufferEvent, 50) == WAIT_TIMEOUT)
-			continue;
-
-		auto pCmdLogContent = std::make_shared<CmdLogContent>(*pLogContent);
-		pTestLog->ExcuteLogServerCmd(pCmdLogContent);
-		::SetEvent(hReadyEvent);
-	}
-
-	::UnmapViewOfFile(pLogContent);
-	::CloseHandle(hReadyEvent);
-	::CloseHandle(hBufferEvent);
-	::CloseHandle(hMutex);
-	::CloseHandle(hMapFile);
-
-	::SetEvent(pTestLog->hReleaseEvent);
-	return 0;
-}
-
-VOID CLog::ExcuteLogServerCmd(_In_ std::shared_ptr<CmdLogContent> CmdLogContent_)
-{
-	std::thread t([CmdLogContent_, this]
-	{
-		if (!CCharacter::wstrcmp_my(CmdLogContent_->wszClientName, L"ALL") && !CCharacter::wstrcmp_my(CmdLogContent_->wszClientName, wsClientName.c_str()))
-			return;
-
-		LOG_C(em_Log_Type::em_Log_Type_Custome, L"Client:%s Excute Cmd Text:%s", CmdLogContent_->wszClientName, CmdLogContent_->wszCmd);
-		CLExpressionCalc ExpAnalysis;
-
-		std::wstring wsExpText = CmdLogContent_->wszCmd;
-		if (ExpAnalysis.IsConformToCmdType(wsExpText))
-			ExpAnalysis.Analysis(wsExpText);
-		else
-			Expr.Run(wsExpText);
-	});
-	t.detach();
 }
 
 VOID CLog::AddLogContentToQueue(_In_ CONST LogContent& LogContent_)
