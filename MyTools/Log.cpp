@@ -116,6 +116,11 @@ VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std:
 	SetResDeleter(hSaveThread, [](HANDLE& hThread) {::CloseHandle(hThread); });
 }
 
+VOID CLog::SetClientName(_In_ CONST std::wstring& cwsClientName)
+{
+	wsClientName = cwsClientName;
+}
+
 BOOL CLog::PrintTo(_In_ CONST LogContent& LogContent_)
 {
 	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, CL_LOG_MUTEX); // wait for LogServer

@@ -90,6 +90,9 @@ public:
 	// SaveLogPath have to like 'C:\\'
 	VOID SetClientName(_In_ CONST std::wstring& cwsClientName, _In_ CONST std::wstring wsSaveLogPath, _In_ BOOL bOverWrite, _In_ ULONG ulMaxSize);
 
+	// Mutiple Thread UnSafe, be care use!
+	VOID SetClientName(_In_ CONST std::wstring& cwsClientName);
+
 	VOID Release();
 
 private:

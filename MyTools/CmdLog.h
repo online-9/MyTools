@@ -36,6 +36,8 @@ public:
 
 	BOOL Run(_In_ CONST std::wstring& wsClientName, _In_ CONST std::vector<ExpressionFunPtr>& ParmVecFunPtr);
 	VOID Stop();
+
+	VOID ReSetClientName(_In_ CONST std::wstring& wsClientName);
 private:
 	static DWORD WINAPI _RecvThread(LPVOID lpParm);
 

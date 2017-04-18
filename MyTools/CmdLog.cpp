@@ -42,6 +42,12 @@ VOID CCmdLog::Stop()
 	_hRecvThread = NULL;
 }
 
+VOID CCmdLog::ReSetClientName(_In_ CONST std::wstring& wsClientName)
+{
+	_wsClientName = wsClientName;
+	BreakLogConnect();
+}
+
 DWORD WINAPI CCmdLog::_RecvThread(LPVOID lpParm)
 {
 	CCmdLog* pCCmdLog = (CCmdLog *)lpParm;
