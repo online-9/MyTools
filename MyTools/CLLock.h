@@ -1,6 +1,7 @@
 #ifndef __CLLOCK_H__
 #define __CLLOCK_H__
 
+#include <mutex>
 #include "ToolsPublic.h"
 
 class CLLock
@@ -11,13 +12,14 @@ public:
 
 	BOOL Access(std::function<void(void)> MethodPtr) CONST;
 
+private:
 	void Lock() CONST;
 	void UnLock() CONST;
 
 private:
 	//HANDLE hMutex;
-	mutable CRITICAL_SECTION LockSection;
-	std::wstring wsLockName;
+	mutable std::mutex _Mutex;
+	std::wstring _wsLockName;
 };
 
 
