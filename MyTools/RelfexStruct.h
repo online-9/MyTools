@@ -14,7 +14,11 @@ public:
 
 	BOOL Register(_In_ CONST std::wstring& wsText, _In_ CONST LPVOID lpAddr);
 
-
+	template<typename T>
+	T GetPtr(_In_ CONST std::wstring& wsText)
+	{
+		return reinterpret_cast<T>(GetPtr_By_Text(wsText));
+	}
 private:
 	LPCVOID GetPtr_By_Text(_In_ CONST std::wstring& wsText);
 
