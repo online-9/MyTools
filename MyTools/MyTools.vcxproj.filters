@@ -64,6 +64,9 @@
     <Filter Include="Character\Script">
       <UniqueIdentifier>{907da649-50c0-4c29-8923-9c385ca94de4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Reflex">
+      <UniqueIdentifier>{cae88c9b-1a08-4e43-b4d3-87e5f438ae96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s.cpp">
@@ -137,6 +140,9 @@
     </ClCompile>
     <ClCompile Include="CmdLogServer.cpp">
       <Filter>Debug\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="RelfexStruct.cpp">
+      <Filter>Reflex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -232,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="CmdLogServer.h">
       <Filter>Debug\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="RelfexStruct.h">
+      <Filter>Reflex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

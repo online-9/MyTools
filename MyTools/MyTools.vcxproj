@@ -136,6 +136,7 @@
     <ClCompile Include="CLNoModuleDLL.cpp" />
     <ClCompile Include="DES.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="RelfexStruct.cpp" />
     <ClCompile Include="s.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="TimeTick.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="DES.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="RC4.hpp" />
+    <ClInclude Include="RelfexStruct.h" />
     <ClInclude Include="Script.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TimeTick.h" />
