@@ -12,7 +12,7 @@ VOID CRelfexStruct::SetErrorPtr(_In_ std::function<VOID(CONST std::wstring&)> fn
 	_fnErrorPtr = fnErrorPtr;
 }
 
-BOOL CRelfexStruct::Register(_In_ CONST std::wstring& wsText, _In_ CONST LPVOID lpAddr)
+BOOL CRelfexStruct::Register(_In_ CONST std::wstring& wsText, _In_ LPCVOID lpAddr)
 {
 	if (_MapResPtrText.find(wsText) != _MapResPtrText.end())
 	{

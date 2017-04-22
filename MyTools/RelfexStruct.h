@@ -12,7 +12,7 @@ public:
 
 	VOID SetErrorPtr(_In_ std::function<VOID(CONST std::wstring&)> fnErrorPtr);
 
-	BOOL Register(_In_ CONST std::wstring& wsText, _In_ CONST LPVOID lpAddr);
+	BOOL Register(_In_ CONST std::wstring& wsText, _In_ LPCVOID lpAddr);
 
 	template<typename T>
 	T GetPtr(_In_ CONST std::wstring& wsText)
