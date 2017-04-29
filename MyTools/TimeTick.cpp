@@ -25,6 +25,8 @@ ULONGLONG CTimeTick::GetSpentTime(_In_ em_TimeTick emTimeTick) CONST
 		return (::GetTickCount64() - ulTick) / 1000 / 60;
 	case CTimeTick::em_TimeTick_Second:
 		return (::GetTickCount64() - ulTick) / 1000;
+	case em_TimeTick_Millisecond:
+		return (::GetTickCount64() - ulTick);
 	default:
 		break;
 	}
